@@ -15,8 +15,8 @@ def init() -> None:
 
     # create the SparkSession
     spark = SparkSession.builder.appName('Bank_Analysis').getOrCreate()
-
-
+    data = jsonETL()
+    data.run()
 
 
     spark.stop()

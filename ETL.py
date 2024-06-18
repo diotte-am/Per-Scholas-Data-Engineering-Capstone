@@ -1,35 +1,33 @@
 import typing
 import os
 import json
-class ETL:
-    def __init__(self, filetype: str):
-        self.filetype = filetype
+from abc import ABC, abstractmethod
+import schema_patterns
+import TBL_NAME
+from pyspark.sql import SparkSession
 
-    
+class ETL(ABC):
+    @abstractmethod
+    def extract(self):
+        pass
 
-    def extract_from_directory(self) -> list[str]:
-        """
-        Returns a list of JSON file names within the given directory
+    @abstractmethod
+    def transform(self):
+        pass
 
-        Parameters: 
-            directoryName (str): the name of a directory containing only JSON files
+    @abstractmethod
+    def load(self):
+        pass
 
-        Returns:
-            parsed_list (list[str]): list of file names within the directory
-        """
-        parsed_list = {}
-        print(os.listdir(self.filetype))
-        for filename in os.listdir(self.filetype):
-            
-            f = os.path.join(self.filetype, filename)
-            if os.path.isfile(f):
-                table_name = filename.split(".")[0].upper()
-                parsed_list[table_name] = self.parse_JSON_list(f)
-            else:
-                print("Unable to find", f)
-        return parsed_list
-    
-    def parse_JSON_list(filename: str) -> list[str]:
+
+class jsonETL(ETL):
+
+    def __init__(self):
+        super().__init__()
+        self.filetype = "json"
+        print("JSON loading!")
+
+    def append_JSON_obects(self, filename: str) -> list[str]:
         """
         Returns all JSON objects in file appended to a single list
 
@@ -51,3 +49,37 @@ class ETL:
         f.close()
 
         return branch_list
+
+
+    def extract(self):
+        dir = os.getcwd() + "/Per-Scholas-Data-Engineering-Capstone/"
+        os.chdir(dir)
+        parsed_list = {}
+        for filename in os.listdir(self.filetype):
+            f = os.path.join(self.filetype, filename)
+            if os.path.isfile(f):
+                table_name = filename.split(".")[0].upper()
+                parsed_list[table_name] = self.append_JSON_obects(f)
+            else:
+                print("Unable to find", f)
+
+        print(parsed_list)
+        return parsed_list
+        
+
+    def transform(self):
+        # add factory pattern for transforms
+        spark = SparkSession.getActiveSession()
+        spark.stop()
+        pass
+        print("transform!")
+
+    def load(self):
+        # connect to db
+        pass
+        print("load")
+
+    def run(self):
+        self.extract()
+        self.transform()
+        self.load()
