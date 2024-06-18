@@ -12,13 +12,10 @@ import typing
 INPUT_TYPES = "json"
 
 def init() -> None:
-
     # create the SparkSession
     spark = SparkSession.builder.appName('Bank_Analysis').getOrCreate()
-    data = jsonETL()
-    data.run()
-
-
+    ETLpipeline = jsonETL()
+    ETLpipeline.run()
     spark.stop()
     print("Program completed")
 
