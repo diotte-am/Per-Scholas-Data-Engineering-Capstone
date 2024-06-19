@@ -2,9 +2,13 @@ import typing
 import os
 import json
 from abc import ABC, abstractmethod
-import schema_patterns
-import TBL_NAME
+import schema
+from TBL_NAME import TBL_NAME
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StringType, DateType, IntegerType
+import mysql.connector as dbconnect
+from mysql.connector import Error
+import my_secrets
 
 class ETL(ABC):
 
@@ -58,9 +62,7 @@ class jsonETL(ETL):
         Returns:
             parsed_list (list[str]): list of file names within the directory
         """
-        dir = os.getcwd() + "/Per-Scholas-Data-Engineering-Capstone/"
-        # set working directory
-        os.chdir(dir)
+ 
         parsed_dict = {}
         # iterate thru every json in the directory
         for filename in os.listdir(self.filetype):
@@ -79,31 +81,94 @@ class jsonETL(ETL):
         Applies transformations to each table depending on stored schema
 
         Parameters: 
-            parsed_lists (dict[str]): a dictionary of dataframes, the key is the name of the eventual table
+            parsed_lists (dict[str]): a dictionary of lists, the key is the name of the eventual table
 
         Returns:
             df_dict (dict[str]):  a transformed dictionary of dataframes, the key is the name of the eventual table
 
         """
+        # retreive current spark session
         spark = SparkSession.getActiveSession()
         df_dict = {}
-        for name in parsed_dicts:
-            df_dict[name] = spark.createDataFrame(parsed_dicts[name])
-
-        for k,v in df_dict.items():
-            print(k,v)
-            df_dict[k].createOrReplaceTempView(k)
-            temp = spark.sql(schema_patterns.pattern_dict[k])
+  
+        # apply schema to each DF
+        for k,v in parsed_dicts.items():
+            # convert to df and create temp view
+            spark.createDataFrame(parsed_dicts[k]).createOrReplaceTempView(k)
+            
+            temp = spark.sql(schema.main[k])
+            # save transformed DF
             df_dict[k] = temp
 
+        # create another table for dates based on credit data
+        spark.createDataFrame(
+            parsed_dicts[TBL_NAME.CREDIT.value]).createOrReplaceTempView(TBL_NAME.PERIOD.value)
+        temp = spark.sql(schema.main[TBL_NAME.PERIOD.value])
+        df_dict[TBL_NAME.PERIOD.value] = temp
+
+
         print(df_dict)
+        return df_dict
+    
+    def create_db(self):
+        ''' Connect to MySQL database'''
+        conn = None
+        try: 
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, password=my_secrets.password)
 
-    def load(self):
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                # Get a cursor
+                cursor = conn.cursor()
+                query = "CREATE DATABASE IF NOT EXISTS creditcard_capstone"
+                cursor.execute(query)
+                conn.close()
+                
+        except Error as e:
+            print("Conection failed!", e)
+
+    def load_FKs(self):
+        ''' Connect to MySQL database'''
+        conn = None
+        try: 
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                # Get a cursor
+                cursor = conn.cursor()
+                for k,v in schema.pk.items():
+                    cursor.execute(v)
+
+                conn.close()
+                
+        except Error as e:
+            print("Conection failed!", e)
+
+
+
+
+    def load(self, data: dict[str]):
+        
         # connect to db
-        pass
-        print("load")
+        self.create_db()
 
-    def run(self):
+        # iterate thru all dataframes and load them to the database as a table
+        for k, df in data.items():
+            df.write.format("jdbc") \
+            .mode("append") \
+            .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone") \
+            .option("dbtable", k) \
+            .option("user", my_secrets.username) \
+            .option("password", my_secrets.password) \
+            .save()
+
+        self.load_FKs()
+
+
+    # create period table
+
+    def run(self): 
         data = self.extract()
-        self.transform(data)
-        self.load()
+        data = self.transform(data)
+        self.load(data)

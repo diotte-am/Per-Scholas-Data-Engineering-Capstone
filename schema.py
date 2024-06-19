@@ -1,9 +1,10 @@
-pattern_dict = {
+main = {
+    # table 1
     "CDW_SAPP_CUSTOMER" : "SELECT SSN,\
         FIRST_NAME,\
         MIDDLE_NAME,\
         LAST_NAME,\
-        CREDIT_CARD_NO,\
+        CAST(CREDIT_CARD_NO AS INT),\
         CONCAT(STREET_NAME, ', ', APT_NO) AS FULL_STREET_ADDRESS,\
             CUST_CITY,\
         CUST_STATE,\
@@ -15,6 +16,7 @@ pattern_dict = {
         AS CUST_PHONE,\
         CUST_EMAIL,\
         LAST_UPDATED FROM CDW_SAPP_CUSTOMER",
+    # table 2
     "CDW_SAPP_BRANCH" : "SELECT BRANCH_CODE,\
         BRANCH_NAME,\
         BRANCH_STREET,\
@@ -27,12 +29,34 @@ pattern_dict = {
             SUBSTRING(BRANCH_PHONE, 7))\
         AS BRANCH_PHONE,\
         LAST_UPDATED FROM CDW_SAPP_BRANCH",
-    "CDW_SAPP_CREDIT" : "SELECT CREDIT_CARD_NO,\
+    # table 3
+    "CDW_SAPP_CREDIT" : "SELECT CAST(CREDIT_CARD_NO AS INT),\
         CUST_SSN,\
         10000 * Year + 100 * Month + Day AS TIMEID,\
         BRANCH_CODE,\
         TRANSACTION_TYPE,\
         TRANSACTION_VALUE,\
-        TRANSACTION_ID FROM CDW_SAPP_CREDIT"
+        TRANSACTION_ID FROM CDW_SAPP_CREDIT",
+    # table 4
+    "CDW_SAPP_PERIOD" : "SELECT DISTINCT Day,\
+        Month,\
+        Year,\
+        10000 * Year + 100 * Month + Day AS TIMEID\
+        FROM CDW_SAPP_CREDIT"
 }
 
+pk = {
+    # table 1
+    "CDW_SAPP_CUSTOMER" : "ALTER TABLE CDW_SAPP_CUSTOMER ADD PRIMARY KEY (SSN)",
+    # table 2
+    "CDW_SAPP_BRANCH" : "ALTER TABLE CDW_SAPP_BRANCH ADD PRIMARY KEY (BRANCH_CODE)",
+    # table 3
+    "CDW_SAPP_CREDIT" : "ALTER TABLE CDW_SAPP_CREDIT ADD PRIMARY KEY (TRANSACTION_ID)",
+    # table 4
+    "CDW_SAPP_PERIOD" : "ALTER TABLE CDW_SAPP_PERIOD ADD PRIMARY KEY (TIMEID)"
+}
+    
+# write out proper my sql script to create tables with proper ids and data type.
+# CHECK DATA TYPES
+# MAKE A DIAGRAM
+# TAKE NOTES ON DATA TYPE AND DECISIONS YOU MADE SO FAR

@@ -9,9 +9,10 @@ from pyspark.sql.types import StringType
 from ETL import *
 import typing
 
+
 INPUT_TYPES = "json"
 
-def init() -> None:
+def runETL() -> None:
     # create the SparkSession
     spark = SparkSession.builder.appName('Bank_Analysis').getOrCreate()
     ETLpipeline = jsonETL()
@@ -21,7 +22,7 @@ def init() -> None:
 
 
 def main():
-    init()
+    runETL()
 
 if __name__ == "__main__":
     main()
