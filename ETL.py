@@ -139,6 +139,9 @@ class jsonETL(ETL):
                 cursor = conn.cursor()
                 for k,v in schema.pk.items():
                     cursor.execute(v)
+                
+                for query in schema.fk:
+                    cursor.execute(query)
 
                 conn.close()
                 
@@ -165,9 +168,7 @@ class jsonETL(ETL):
 
         self.load_FKs()
 
-
     # create period table
-
     def run(self): 
         data = self.extract()
         data = self.transform(data)
