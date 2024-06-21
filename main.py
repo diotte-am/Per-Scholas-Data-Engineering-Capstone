@@ -20,9 +20,15 @@ def runETL() -> None:
     spark.stop()
     print("Program completed")
 
+def runGUI() -> None:
+    program_running = True
+    while program_running:
+         
+
 
 def main():
     runETL()
+    runGUI()
 
 if __name__ == "__main__":
     main()
