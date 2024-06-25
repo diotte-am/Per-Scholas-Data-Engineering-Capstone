@@ -31,7 +31,6 @@ main = {
         CAST(LAST_UPDATED AS DATE) FROM CDW_SAPP_BRANCH",
     # table 3
     "CDW_SAPP_CREDIT" : "SELECT CAST(CREDIT_CARD_NO AS BIGINT),\
-        CUST_SSN,\
         10000 * Year + 100 * Month + Day AS TIMEID,\
         BRANCH_CODE,\
         TRANSACTION_TYPE,\

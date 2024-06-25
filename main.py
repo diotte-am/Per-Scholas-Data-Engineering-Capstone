@@ -6,6 +6,7 @@ import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType
 
+
 from ETL import *
 import typing
 
@@ -22,13 +23,13 @@ def runETL() -> None:
 
 def runGUI() -> None:
     program_running = True
-    while program_running:
+
          
 
 
 def main():
     runETL()
-    runGUI()
+    #runGUI()
 
 if __name__ == "__main__":
     main()

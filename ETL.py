@@ -139,6 +139,8 @@ class jsonETL(ETL):
                 cursor = conn.cursor()
                 for k,v in schema.pk.items():
                     cursor.execute(v)
+
+                cursor.execute()
                 
                 for query in schema.fk:
                     cursor.execute(query)
