@@ -117,7 +117,7 @@ class GUI_util():
                 
                 final = pd.concat([temp, final], ignore_index=True)
             
-            return final.values.flatten()
+            return final.values
         
     def get_years(self):
         conn = None

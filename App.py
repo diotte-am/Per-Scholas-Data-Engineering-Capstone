@@ -3,12 +3,13 @@ import tkinter.messagebox
 import customtkinter
 import GUI_util as util
 from TBL_NAME import TBL_NAME
-
+TAB_NAMES = ["Transactions", "Customers", "Visualizations"]
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
+CURRENT_TAB = "Customers"
 class App(customtkinter.CTk):
+
     def __init__(self):
         super().__init__()
 
@@ -44,54 +45,48 @@ class App(customtkinter.CTk):
         self.Button_visualizations = customtkinter.CTkButton(self.Frame_sidebar, command=self.sidebar_button_event)
         self.Button_visualizations.grid(row=3, column=0, padx=20, pady=10)
 
-        # year dropdown
-        # frame below to display results
-        year_list = self.util.get_years()
-        self.Label_year = customtkinter.CTkLabel(self.Frame_sidebar, text="Year:", anchor="w")
-        self.Label_year.grid(row=4, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar, values=year_list,
-                                                                       command=self.optionMenu_year)
-        self.OptionMenu_year.grid(row=5, column=0, padx=20, ipady=0)
-        self.OptionMenu_year.set("Choose Year")
-        
-        self.Label_month = customtkinter.CTkLabel(self.Frame_sidebar, text="Month:", anchor="w")
-        self.Label_month.grid(row=6, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_month = customtkinter.CTkOptionMenu(self.Frame_sidebar, values=MONTHS)
-        self.OptionMenu_month.grid(row=7, column=0, padx=20, ipady=0, pady=(0,10))
-        self.OptionMenu_month.set("Choose Month")
+        # set default values
+        self.Button_visualizations.configure(text="Visualizations")
+        self.Button_transactions.configure(text="Transactions")
+        self.Button_customer.configure(text="Customers")
+    
+        # create textbox
+        self.Textbox_output = customtkinter.CTkTextbox(self)
+        self.Textbox_output.grid(row=0, column=1, columnspan=3, rowspan=4, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.Textbox_output.insert("0.0", "Enter search parameters")
 
-        self.Label_zip = customtkinter.CTkLabel(self.Frame_sidebar, text="5 Digit Zip:", anchor="w")
-        self.Label_zip.grid(row=8, column=0, padx=20, pady=(10, 0))
-        self.Entry_zip = customtkinter.CTkEntry(self.Frame_sidebar, placeholder_text="Enter Zip")
-        self.Entry_zip.grid(row=9, column=0, padx=20, pady=(0, 10), ipady=0)
-        
         # submit button
         self.Label_submit = customtkinter.CTkLabel(self.Frame_sidebar, text="5 Digit Zip:", anchor="w")
         self.Label_submit.grid(row=10, column=0, padx=20, pady=(10, 0))
         self.Button_submit = customtkinter.CTkButton(master=self.Frame_sidebar, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.submit_parameters)
         self.Button_submit.grid(row=10, column=0, padx=20)
 
-        # create textbox
-        self.Textbox_output = customtkinter.CTkTextbox(self)
-        self.Textbox_output.grid(row=0, column=1, columnspan=3, rowspan=4, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.Textbox_output.insert("0.0", "Enter search parameters")
 
+        # year dropdown
+        # frame below to display results
+        year_list = self.util.get_years()
+        self.Label_year = customtkinter.CTkLabel(self.Frame_sidebar, text="Year:", anchor="w")
+        
+        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar, values=year_list,
+                                                                       command=self.optionMenu_year)
+        self.OptionMenu_year.set("Choose Year")
+        self.Label_month = customtkinter.CTkLabel(self.Frame_sidebar, text="Month:", anchor="w")
+        self.OptionMenu_month = customtkinter.CTkOptionMenu(self.Frame_sidebar, values=MONTHS)
+        self.OptionMenu_month.set("Choose Month")
+        self.Label_zip = customtkinter.CTkLabel(self.Frame_sidebar, text="5 Digit Zip:", anchor="w")
+        self.Entry_zip = customtkinter.CTkEntry(self.Frame_sidebar, placeholder_text="Enter Zip")
 
-        # set default values
-        self.Button_visualizations.configure(text="Visualizations")
-        self.Button_transactions.configure(text="Transactions")
-        self.Button_customer.configure(text="Customers")
-    
-    def popup_window(self):
-        window = customtkinter.CTkToplevel()
+        if CURRENT_TAB == "Transactions":
+            self.Label_year.grid(row=4, column=0, padx=20, pady=(10, 0))
+            self.OptionMenu_year.grid(row=5, column=0, padx=20, ipady=0)
+            self.Label_month.grid(row=6, column=0, padx=20, pady=(10, 0))
+            self.OptionMenu_month.grid(row=7, column=0, padx=20, ipady=0, pady=(0,10))
+            self.Label_zip.grid(row=8, column=0, padx=20, pady=(10, 0))
+            self.Entry_zip.grid(row=9, column=0, padx=20, pady=(0, 10), ipady=0)
 
-        label = customtkinter.CTkLabel(window, text="Hello World!")
-        label.pack(fill='x', padx=50, pady=5)
-
-        button_close = customtkinter.CTkButton(window, text="Close", command=window.destroy)
-        button_close.pack(fill='x')
-
-
+        elif CURRENT_TAB == "Customers":
+            print("whee")
+        
 
 
     def optionMenu_year(self, new_appearance_mode: str):
@@ -130,7 +125,11 @@ class App(customtkinter.CTk):
             results = util.GUI_util.all_details(util.GUI_util,
                                       [zip, month, year])
             results = util.GUI_util.extract_fields(util.GUI_util, results)
-            self.Textbox_output.insert(text=results, index=0.0)
+            print(len(results))
+            string = ""
+            for row in results:
+                string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
+            self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
 
 
 
