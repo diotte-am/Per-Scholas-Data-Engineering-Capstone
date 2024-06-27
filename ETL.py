@@ -106,7 +106,6 @@ class jsonETL(ETL):
         temp = spark.sql(schema.main[TBL_NAME.PERIOD.value])
         df_dict[TBL_NAME.PERIOD.value] = temp
 
-
         print(df_dict)
         return df_dict
     
@@ -139,8 +138,6 @@ class jsonETL(ETL):
                 cursor = conn.cursor()
                 for k,v in schema.pk.items():
                     cursor.execute(v)
-
-                cursor.execute()
                 
                 for query in schema.fk:
                     cursor.execute(query)
@@ -149,9 +146,6 @@ class jsonETL(ETL):
                 
         except Error as e:
             print("Conection failed!", e)
-
-
-
 
     def load(self, data: dict[str]):
         

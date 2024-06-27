@@ -51,8 +51,7 @@ class GUI_util():
         # query = where customer.zip = input_zip AND CONCAT(year, month) LIKE credit.TIMEID[0:6]
         return input_zip, input_month, input_year
     
-    def all_details(self):
-        inputs = self.build_query()
+    def all_details(self, inputs):
         if self.current_table == TBL_NAME.CUST:
             query = "SELECT * FROM CDW_SAPP_CUSTOMER"
             
@@ -73,13 +72,17 @@ class GUI_util():
                 df = cursor.fetchall()
 
                 conn.close()
+                return df
                         
         except Error as e:
             print("Conection failed!", e)
         
-        return df
+        
     
-    def display_output(self, results: list[str]):
+    def set_table(self, table_name: TBL_NAME):
+        self.current_table = table_name
+    
+    def extract_fields(self, results: list[str]):
         if self.current_table == TBL_NAME.CUST:
             for row in results:
                 full_name = " ".join([row[1], row[2], row[3]])
@@ -95,7 +98,7 @@ class GUI_util():
                 print(full_name, ssn_redacted, cc_redacted, street, city, state, country, zip, phone, email)
 
         elif self.current_table == TBL_NAME.CREDIT:
-            final = pd.DataFrame(columns=["credit card number", "transaction time", "branch code", "transaction type", "transation value", "transaction id"])
+            final = pd.DataFrame(columns=["credit card number", "transaction time", "branch code", "transaction type", "transaction value", "transaction id"])
             for row in results:
                 cc_redacted = "**** **** **** " + str(row[0])[12:]
                 time = str(row[1])[0:4] + "/" + str(row[1])[4:6] + "/" + str(row[1])[6:]
@@ -113,12 +116,33 @@ class GUI_util():
                     })
                 
                 final = pd.concat([temp, final], ignore_index=True)
-            return tabulate(final, headers=final.keys().array, tablefmt='github')
-                
+            
+            return final.values.flatten()
+        
+    def get_years(self):
+        conn = None
+        query = "SELECT DISTINCT Year FROM CDW_SAPP_PERIOD"
+        try: 
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
 
-      
-g = GUI_util()
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                year_list = []
+                for row in results:
+                    year_list.append(str(row[0]))
 
-results = g.all_details()
-results = g.display_output(results)
-print(results)
+                conn.close()
+
+            return year_list
+   
+    
+                            
+        except Error as e:
+            print("Conection failed!", e)
+        
+
+
+

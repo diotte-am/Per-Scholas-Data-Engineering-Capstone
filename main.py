@@ -10,6 +10,7 @@ from pyspark.sql.types import StringType
 from ETL import *
 import typing
 
+from App import App
 
 INPUT_TYPES = "json"
 
@@ -21,15 +22,14 @@ def runETL() -> None:
     spark.stop()
     print("Program completed")
 
-def runGUI() -> None:
+def runApp() -> None:
     program_running = True
-
-         
-
+    app = App()
+    app.mainloop()
 
 def main():
-    runETL()
-    #runGUI()
+    #runETL()
+    runApp()
 
 if __name__ == "__main__":
     main()

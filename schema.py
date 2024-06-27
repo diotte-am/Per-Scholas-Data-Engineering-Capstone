@@ -33,6 +33,7 @@ main = {
     "CDW_SAPP_CREDIT" : "SELECT CAST(CREDIT_CARD_NO AS BIGINT),\
         10000 * Year + 100 * Month + Day AS TIMEID,\
         BRANCH_CODE,\
+        CUST_SSN,\
         TRANSACTION_TYPE,\
         TRANSACTION_VALUE,\
         TRANSACTION_ID FROM CDW_SAPP_CREDIT",
