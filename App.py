@@ -3,6 +3,9 @@ import tkinter.messagebox
 import customtkinter
 import GUI_util as util
 from TBL_NAME import TBL_NAME
+from tkcalendar import Calendar, DateEntry
+import datetime
+
 TAB_NAMES = ["Transactions", "Customer View", "Customer Edit"]
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -80,9 +83,36 @@ class App(customtkinter.CTk):
         self.Frame_sidebar_customers.grid_rowconfigure(10, weight=1)
         self.Label_customer = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="The customer UI will go here")
         self.Label_customer.grid(row=0, column=0)
+        
+
+        self.DateEntry_label1 = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="Transaction Date")
+        self.DataEntry_1 = DateEntry(self.Tabview.tab("Customers"), date_pattern="yyyy-mm-dd")
+
+        self.CheckBox = customtkinter.CTkCheckBox(self.Tabview.tab("Customers"), checkbox_height=12, checkbox_width=12, command=self.handle_checkbox, height=60)
+        self.CheckBox.configure(text="Query time period")
+
+        self.DateEntry_label2 = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="End date")
+        self.DataEntry_2 = DateEntry(self.Tabview.tab("Customers"), date_pattern="yyyy-mm-dd")
+
+        self.DateEntry_label1.grid(row=1, column=0)
+        self.DataEntry_1.grid(row=2, column=0)
+        self.CheckBox.grid(row=3, column=0)
+        
+        
+
+  
 
 
         
+    def handle_checkbox(self):
+        if self.CheckBox.get():
+            self.DataEntry_2.grid(row=5, column=0)
+            self.DateEntry_label2.grid(row=4, column=0)
+            self.DateEntry_label1.configure(text="Start Date")
+        else:
+            self.DataEntry_2.grid_remove()
+            self.DateEntry_label2.grid_remove()
+            self.DateEntry_label1.configure(text="Transaction Date")
 
 
 
@@ -124,6 +154,7 @@ class App(customtkinter.CTk):
             else:
                 string = ""
                 for row in results:
+                    
                     string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
             self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
 
