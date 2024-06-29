@@ -50,7 +50,7 @@ class App(customtkinter.CTk):
         # year dropdown
         year_list = self.util.get_years()
         self.Label_year = customtkinter.CTkLabel(self.Frame_sidebar_transactions, text="Year:", anchor="w")
-        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar_transactions, values=year_list,command=self.optionMenu_year)
+        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar_transactions, values=year_list)
         self.OptionMenu_year.set("Choose Year")
 
         # month dropdown
@@ -64,60 +64,68 @@ class App(customtkinter.CTk):
 
         # submit button
         self.Button_submit = customtkinter.CTkButton(master=self.Frame_sidebar_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.submit_parameters)
-        self.Button_submit.grid(row=10, column=0, padx=20)
+        self.Button_submit.grid(row=10, column=0, padx=30)
 
         # set to view
-        self.Label_year.grid(row=4, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_year.grid(row=5, column=0, padx=20, ipady=0)
-        self.Label_month.grid(row=6, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_month.grid(row=7, column=0, padx=20, ipady=0, pady=(0,10))
-        self.Label_zip.grid(row=8, column=0, padx=20, pady=(10, 0))
-        self.Entry_zip.grid(row=9, column=0, padx=20, pady=(0, 10), ipady=0)
+        self.Label_year.grid(row=4, column=0, padx=30, pady=(10, 0))
+        self.OptionMenu_year.grid(row=5, column=0, padx=30, ipady=0)
+        self.Label_month.grid(row=6, column=0, padx=30, pady=(10, 0))
+        self.OptionMenu_month.grid(row=7, column=0, padx=30, ipady=0, pady=(0,10))
+        self.Label_zip.grid(row=8, column=0, padx=30, pady=(10, 0))
+        self.Entry_zip.grid(row=9, column=0, padx=30, pady=(0, 10), ipady=0)
 
         '''
         Customers
         ''' 
         # Customers sodebar
+        # add customer button, if customer is not selected, the options are
+        
         self.Frame_sidebar_customers = customtkinter.CTkFrame(self.Tabview.tab("Customers"), width=140, corner_radius=0)
         self.Frame_sidebar_customers.grid(row=0, column=0, rowspan=10, sticky="nsew")
         self.Frame_sidebar_customers.grid_rowconfigure(10, weight=1)
-        self.Label_customer = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="The customer UI will go here")
-        self.Label_customer.grid(row=0, column=0)
+
+        self.Label_find_customer = customtkinter.CTkLabel(
+            self.Frame_sidebar_customers, 
+            text="Enter customer ID\nor click the\nFind ID button\nbelow to search\nby customer details")
         
 
-        self.DateEntry_label1 = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="Transaction Date")
-        self.DataEntry_1 = DateEntry(self.Tabview.tab("Customers"), date_pattern="yyyy-mm-dd")
+        self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
+        self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Find ID")
 
-        self.CheckBox = customtkinter.CTkCheckBox(self.Tabview.tab("Customers"), checkbox_height=12, checkbox_width=12, command=self.handle_checkbox, height=60)
+        
+
+        self.DateEntry_label1 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="Transaction Date")
+        self.DataEntry_1 = DateEntry(self.Frame_sidebar_customers, date_pattern="yyyy-mm-dd")
+
+        self.CheckBox = customtkinter.CTkCheckBox(self.Frame_sidebar_customers, checkbox_height=12, checkbox_width=12, command=self.handle_checkbox, height=60)
         self.CheckBox.configure(text="Query time period")
 
-        self.DateEntry_label2 = customtkinter.CTkLabel(self.Tabview.tab("Customers"), text="End date")
-        self.DataEntry_2 = DateEntry(self.Tabview.tab("Customers"), date_pattern="yyyy-mm-dd")
+        self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="End date", state="disabled", text_color_disabled="grey")
+        self.DataEntry_2 = DateEntry(self.Frame_sidebar_customers, date_pattern="yyyy-mm-dd", state="disabled")
 
-        self.DateEntry_label1.grid(row=1, column=0)
-        self.DataEntry_1.grid(row=2, column=0)
-        self.CheckBox.grid(row=3, column=0)
+        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Submit")
+
+        self.Label_find_customer.grid(row=0, column=0, padx=30, pady=20)
+        self.Entry_find_customer.grid(row=1, column=0, padx=30, ipady=0)
+        self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
+        self.DateEntry_label1.grid(row=3, column=0, padx=30)
+        self.DataEntry_1.grid(row=4, column=0, padx=30)
+        self.CheckBox.grid(row=5, column=0, padx=30)
+        self.DataEntry_2.grid(row=6, column=0)
+        self.DateEntry_label2.grid(row=7, column=0)
+        self.Button_customer_submit.grid(row=8, column=0, pady=20)
+
         
-        
-
-  
-
-
         
     def handle_checkbox(self):
         if self.CheckBox.get():
-            self.DataEntry_2.grid(row=5, column=0)
-            self.DateEntry_label2.grid(row=4, column=0)
             self.DateEntry_label1.configure(text="Start Date")
+            self.DataEntry_2.configure(state="normal")
+            self.DateEntry_label2.configure(state="normal")
         else:
-            self.DataEntry_2.grid_remove()
-            self.DateEntry_label2.grid_remove()
+            self.DataEntry_2.configure(state="disabled")
             self.DateEntry_label1.configure(text="Transaction Date")
 
-
-
-    def optionMenu_year(self, new_appearance_mode: str):
-        pass
 
     def submit_parameters(self):
         year = self.OptionMenu_year.get()
@@ -154,30 +162,9 @@ class App(customtkinter.CTk):
             else:
                 string = ""
                 for row in results:
-                    
+
                     string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
             self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
-
-    def view_transactions(self):
-        self.hide_customers
-        self.Label_year.grid(row=4, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_year.grid(row=5, column=0, padx=20, ipady=0)
-        self.Label_month.grid(row=6, column=0, padx=20, pady=(10, 0))
-        self.OptionMenu_month.grid(row=7, column=0, padx=20, ipady=0, pady=(0,10))
-        self.Label_zip.grid(row=8, column=0, padx=20, pady=(10, 0))
-        self.Entry_zip.grid(row=9, column=0, padx=20, pady=(0, 10), ipady=0)
-
-    def hide_transactions(self):
-        self.Label_year.grid_forget()
-        self.OptionMenu_year.grid_forget()
-        self.Label_month.grid_forget()
-        self.OptionMenu_month.grid_forget()
-        self.Label_zip.grid_forget()
-        self.Entry_zip.grid_forget()
-
-
-    def view_customers(self):
-        self.hide_transactions()
 
 
     def hide_customers(self):
