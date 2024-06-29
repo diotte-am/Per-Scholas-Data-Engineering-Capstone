@@ -6,7 +6,6 @@ from TBL_NAME import TBL_NAME
 from tkcalendar import Calendar, DateEntry
 import datetime
 
-TAB_NAMES = ["Transactions", "Customer View", "Customer Edit"]
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -33,11 +32,12 @@ class App(customtkinter.CTk):
         self.Tabview.add("Customers")
         self.Tabview.add("Transactions")
         self.Tabview.add("Viz")
-
+        
         # create textbox for output
         self.Textbox_output = customtkinter.CTkTextbox(self)
         self.Textbox_output.grid(row=0, column=1, columnspan=3, rowspan=4, padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.Textbox_output.insert("0.0", "Enter search parameters")
+        self.Textbox_output.configure(state="disabled")
 
         '''
         Transactions
@@ -86,11 +86,12 @@ class App(customtkinter.CTk):
 
         self.Label_find_customer = customtkinter.CTkLabel(
             self.Frame_sidebar_customers, 
-            text="Enter customer ID\nor click the\nFind ID button\nbelow to search\nby customer details")
+            text="No customer selected\n")
         
 
+        self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer")
         self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
-        self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Find ID")
+        self.Button_edit_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Edit customer", state="disabled")
 
         
 
@@ -100,20 +101,23 @@ class App(customtkinter.CTk):
         self.CheckBox = customtkinter.CTkCheckBox(self.Frame_sidebar_customers, checkbox_height=12, checkbox_width=12, command=self.handle_checkbox, height=60)
         self.CheckBox.configure(text="Query time period")
 
-        self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="End date", state="disabled", text_color_disabled="grey")
+        self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="", state="disabled", text_color_disabled="grey")
         self.DataEntry_2 = DateEntry(self.Frame_sidebar_customers, date_pattern="yyyy-mm-dd", state="disabled")
 
-        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Submit")
+        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_sidebar_customers, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", command=self.submit_parameters)
+        self.Button_submit.grid(row=10, column=0, padx=30)
+        
 
         self.Label_find_customer.grid(row=0, column=0, padx=30, pady=20)
         self.Entry_find_customer.grid(row=1, column=0, padx=30, ipady=0)
         self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
-        self.DateEntry_label1.grid(row=3, column=0, padx=30)
-        self.DataEntry_1.grid(row=4, column=0, padx=30)
-        self.CheckBox.grid(row=5, column=0, padx=30)
-        self.DataEntry_2.grid(row=6, column=0)
-        self.DateEntry_label2.grid(row=7, column=0)
-        self.Button_customer_submit.grid(row=8, column=0, pady=20)
+        self.Button_edit_customer.grid(row=3, column=0, padx=30)
+        self.DateEntry_label1.grid(row=4, column=0, padx=30, pady=(30, 0))
+        self.DataEntry_1.grid(row=5, column=0, padx=30)
+        self.CheckBox.grid(row=6, column=0, padx=30)
+        self.DataEntry_2.grid(row=7, column=0)
+        self.DateEntry_label2.grid(row=8, column=0)
+        self.Button_customer_submit.grid(row=9, column=0, pady=20)
 
         
         
@@ -121,13 +125,16 @@ class App(customtkinter.CTk):
         if self.CheckBox.get():
             self.DateEntry_label1.configure(text="Start Date")
             self.DataEntry_2.configure(state="normal")
-            self.DateEntry_label2.configure(state="normal")
+            self.DateEntry_label2.configure(state="normal", text="End Date")
+
         else:
             self.DataEntry_2.configure(state="disabled")
+            self.DateEntry_label2.configure(state="disabled", text="")
             self.DateEntry_label1.configure(text="Transaction Date")
 
 
     def submit_parameters(self):
+        self.Textbox_output.configure(state="normal")
         year = self.OptionMenu_year.get()
         missing = []
         if year == "Choose Year":
@@ -165,7 +172,7 @@ class App(customtkinter.CTk):
 
                     string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
             self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
-
+        self.Textbox_output.configure(state="disabled")
 
     def hide_customers(self):
         pass
