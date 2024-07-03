@@ -21,7 +21,7 @@ class App(customtkinter.CTk):
 
         # configure window
         self.title("creditcard_capstone Query")
-        self.geometry(f"{1100}x{580}")
+        self.geometry(f"{1100}x{550}")
 
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -36,8 +36,8 @@ class App(customtkinter.CTk):
         self.Tabview.add("Viz")
         
         # create textbox for output
-        self.Textbox_output = customtkinter.CTkTextbox(self)
-        self.Textbox_output.grid(row=0, column=1, columnspan=3, rowspan=4, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.Textbox_output = customtkinter.CTkTextbox(self, width=850)
+        self.Textbox_output.grid(row=0, column=1, rowspan=12, sticky="ns", pady=40)
         self.Textbox_output.insert("0.0", "Enter search parameters")
         self.Textbox_output.configure(state="disabled")
 
@@ -90,17 +90,12 @@ class App(customtkinter.CTk):
             self.Frame_sidebar_customers, 
             text="No customer selected\n")
         
-        self.Label_find_customer_info = customtkinter.CTkLabel(
-            self.Frame_sidebar_customers, 
-            text=" ",
-        )
 
         self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer", command=self.lookup_id)
         self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
         self.Button_edit_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Edit customer", state="disabled")
 
         self.Label_find_customer.grid(row=0, column=0, padx=30, pady=20)
-        self.Label_find_customer_info.grid(row=0, column=0, pady=(20, 0))
         self.Entry_find_customer.grid(row=1, column=0, padx=30, ipady=0)
         self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
         self.Button_edit_customer.grid(row=3, column=0, padx=30)
@@ -186,12 +181,13 @@ class App(customtkinter.CTk):
     def lookup_id(self):
         customer_id = self.Entry_find_customer.get()
         all_ids = self.util.get_all_CUST_IDs()
-        print(customer_id in all_ids)
         if customer_id in all_ids:
-            self.Label_find_customer_info.configure(text="")
             self.open_popup(customer_id)
         else:
-            self.Label_find_customer_info.configure(text="ID not found!", text_color="red")
+            self.Textbox_output.configure(state="normal", text_color="red")
+            self.Textbox_output.delete("0.0", customtkinter.END)
+            self.Textbox_output.insert(index=customtkinter.END, text="ID not found!")
+            self.Textbox_output.configure(state="disabled")
             self.open_popup_search()
  
 
