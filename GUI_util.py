@@ -135,14 +135,61 @@ class GUI_util():
                     year_list.append(str(row[0]))
 
                 conn.close()
-
-            return year_list
-   
-    
-                            
+                                      
         except Error as e:
             print("Conection failed!", e)
         
+
+
+
+            return year_list
+        
+    def get_all_CUST_IDs(self):
+        conn = None
+        query = "SELECT CUST_ID FROM CDW_SAPP_CUSTOMER"
+        try:
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                id_list = []
+                for row in results:
+                    id_list.append(str(row[0]))
+
+                conn.close()
+                                  
+        except Error as e:
+            print("Conection failed!", e)
+        return id_list
+    
+    def get_customer(self, cust_id):
+        conn = None
+        query = "SELECT * FROM CDW_SAPP_CUSTOMER WHERE CUST_ID = " + cust_id
+        try:
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                result = cursor.fetchone()
+
+                conn.close()
+                                  
+        except Error as e:
+            print("Conection failed!", e)
+        return result
+
+    
+
+        
+
+
+                
+   
 
 
 

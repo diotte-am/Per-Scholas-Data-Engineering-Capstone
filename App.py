@@ -7,15 +7,17 @@ from tkcalendar import Calendar, DateEntry
 import datetime
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 CURRENT_TAB = "Transactions"
 class App(customtkinter.CTk):
+    
 
     def __init__(self):
         super().__init__()
 
         self.util = util.GUI_util()
+        self.selected_customer = []
 
         # configure window
         self.title("creditcard_capstone Query")
@@ -77,7 +79,7 @@ class App(customtkinter.CTk):
         '''
         Customers
         ''' 
-        # Customers sodebar
+        # Customers sidebar
         # add customer button, if customer is not selected, the options are
         
         self.Frame_sidebar_customers = customtkinter.CTkFrame(self.Tabview.tab("Customers"), width=140, corner_radius=0)
@@ -88,51 +90,58 @@ class App(customtkinter.CTk):
             self.Frame_sidebar_customers, 
             text="No customer selected\n")
         
+        self.Label_find_customer_info = customtkinter.CTkLabel(
+            self.Frame_sidebar_customers, 
+            text=" ",
+        )
 
-        self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer")
+        self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer", command=self.lookup_id)
         self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
         self.Button_edit_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Edit customer", state="disabled")
 
-        
-
-        self.DateEntry_label1 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="Transaction Date")
-        self.DataEntry_1 = DateEntry(self.Frame_sidebar_customers, date_pattern="yyyy-mm-dd")
-
-        self.CheckBox = customtkinter.CTkCheckBox(self.Frame_sidebar_customers, checkbox_height=12, checkbox_width=12, command=self.handle_checkbox, height=60)
-        self.CheckBox.configure(text="Query time period")
-
-        self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_sidebar_customers, text="", state="disabled", text_color_disabled="grey")
-        self.DataEntry_2 = DateEntry(self.Frame_sidebar_customers, date_pattern="yyyy-mm-dd", state="disabled")
-
-        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_sidebar_customers, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", command=self.submit_parameters)
-        self.Button_submit.grid(row=10, column=0, padx=30)
-        
-
         self.Label_find_customer.grid(row=0, column=0, padx=30, pady=20)
+        self.Label_find_customer_info.grid(row=0, column=0, pady=(20, 0))
         self.Entry_find_customer.grid(row=1, column=0, padx=30, ipady=0)
         self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
         self.Button_edit_customer.grid(row=3, column=0, padx=30)
-        self.DateEntry_label1.grid(row=4, column=0, padx=30, pady=(30, 0))
-        self.DataEntry_1.grid(row=5, column=0, padx=30)
-        self.CheckBox.grid(row=6, column=0, padx=30)
-        self.DataEntry_2.grid(row=7, column=0)
-        self.DateEntry_label2.grid(row=8, column=0)
-        self.Button_customer_submit.grid(row=9, column=0, pady=20)
+
+        self.Tabview_inner = customtkinter.CTkTabview(self.Frame_sidebar_customers, width=125)
+        self.Tabview_inner.grid(row=4, column=0, rowspan=10, sticky="nsew", pady=(30,0))
+        self.Tabview_inner.add("Get Bill")
+        self.Tabview_inner.add("View Transactions")
+
+        # get transactions by data range
+        self.Frame_transactions = customtkinter.CTkFrame(self.Tabview_inner.tab("View Transactions"), width=125, corner_radius=0)
+        self.Frame_transactions.grid(row=0, column=0, rowspan=5, sticky="nsew")
+        self.Frame_transactions.grid_rowconfigure(5, weight=1)
+
+        self.DateEntry_label1 = customtkinter.CTkLabel(self.Frame_transactions, text="Start Date", state="disabled", text_color_disabled="grey")
+        self.DateEntry_1 = DateEntry(
+            self.Frame_transactions, 
+            date_pattern="yyyy-mm-dd", 
+            state="disabled", 
+            day=1,
+            month=1,
+            year=2018
+            )
+
+        self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_transactions, text="End Date", state="disabled", text_color_disabled="grey")
+        self.DateEntry_2 = DateEntry(self.Frame_transactions, date_pattern="yyyy-mm-dd", state="disabled")
+
+        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled")
+
+        self.DateEntry_label1.grid(row=0, column=0, padx=30, pady=(10, 0), ipady=0)
+        self.DateEntry_1.grid(row=1, column=0, padx=30, pady=(10, 0))
+        self.DateEntry_2.grid(row=2, column=0, padx=30, pady=(20, 0))
+        self.DateEntry_label2.grid(row=3, column=0)
+        self.Button_customer_submit.grid(row=4, column=0, pady=20)
+
+        # get bill by month/year
+        self.Frame_bill = customtkinter.CTkFrame(self.Tabview_inner.tab("Get Bill"), width=125, corner_radius=0)
+        self.Frame_bill.grid(row=0, column=0, rowspan=5, sticky="nsew")
+        self.Frame_bill.grid_rowconfigure(5, weight=1)
 
         
-        
-    def handle_checkbox(self):
-        if self.CheckBox.get():
-            self.DateEntry_label1.configure(text="Start Date")
-            self.DataEntry_2.configure(state="normal")
-            self.DateEntry_label2.configure(state="normal", text="End Date")
-
-        else:
-            self.DataEntry_2.configure(state="disabled")
-            self.DateEntry_label2.configure(state="disabled", text="")
-            self.DateEntry_label1.configure(text="Transaction Date")
-
-
     def submit_parameters(self):
         self.Textbox_output.configure(state="normal")
         year = self.OptionMenu_year.get()
@@ -174,8 +183,67 @@ class App(customtkinter.CTk):
             self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
         self.Textbox_output.configure(state="disabled")
 
+    def lookup_id(self):
+        customer_id = self.Entry_find_customer.get()
+        all_ids = self.util.get_all_CUST_IDs()
+        print(customer_id in all_ids)
+        if customer_id in all_ids:
+            self.Label_find_customer_info.configure(text="")
+            self.open_popup(customer_id)
+        else:
+            self.Label_find_customer_info.configure(text="ID not found!", text_color="red")
+            self.open_popup_search()
+ 
+
+
     def hide_customers(self):
         pass
+
+    def open_popup(self, customer_id):
+        top= customtkinter.CTkToplevel(self)
+
+
+        top.geometry("350x200")
+        top.title("Customer Lookup")
+        message = "Is this the correct customer?\n"
+        customer = self.util.get_customer(customer_id)
+        message += customer[1] + " " + customer[2] + " " + customer[3] + "\n"
+        message += customer[5] + "\n" + customer[6] + ", " + customer[7] + ", " + customer[8] + ", " + customer[9] + "\n"
+        message += "Phone: " + customer[10] + "\n"
+        message += "Email: " + customer[11] + "\n"
+        customtkinter.CTkLabel(top, text= message).place(x=150,y=50)
+        def confirm_button():
+            top.destroy()
+            top.update()
+            self.selected_customer = customer
+            self.Label_find_customer.configure(text = customer[1] + " " + customer[2] + " " + customer[3] + "\n")
+            self.Button_edit_customer.configure(state="normal")
+            self.DateEntry_label1.configure(state="normal")
+            self.DateEntry_1.configure(state="normal")
+            self.Button_customer_submit.configure(state="normal")
+            self.DateEntry_2.configure(state="normal")
+            self.DateEntry_label2.configure(state="normal")
+
+        def deny_button():
+            top.destroy()
+            top.update()
+            self.Entry_find_customer.delete(0, customtkinter.END)
+            self.open_popup_search()
+
+        confirm = customtkinter.CTkButton(top, text="Yes", width=30, command=confirm_button)
+        decline = customtkinter.CTkButton(top, text="No", width=30, command=deny_button)
+        confirm.place(x=125, y=175)
+        decline.place(x=175, y=175)
+
+
+
+    def open_popup_search(self):
+        top= customtkinter.CTkToplevel(self)
+        top.geometry("750x250")
+        top.title("Search for customer ID")
+        customer_id = "enter query info"
+        customtkinter.CTkLabel(top, text= customer_id).place(x=150,y=80)
+
 
         
 
