@@ -8,8 +8,10 @@ import datetime
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
+year_list = util.GUI_util.get_years()
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-CURRENT_TAB = "Transactions"
+
+        
 class App(customtkinter.CTk):
     
 
@@ -44,13 +46,13 @@ class App(customtkinter.CTk):
         '''
         Transactions
         ''' 
+
         # transaction sidebar
         self.Frame_sidebar_transactions = customtkinter.CTkFrame(self.Tabview.tab("Transactions"), width=140, corner_radius=0)
         self.Frame_sidebar_transactions.grid(row=0, column=0, rowspan=10, sticky="nsew")
         self.Frame_sidebar_transactions.grid_rowconfigure(10, weight=1)
 
         # year dropdown
-        year_list = self.util.get_years()
         self.Label_year = customtkinter.CTkLabel(self.Frame_sidebar_transactions, text="Year:", anchor="w")
         self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar_transactions, values=year_list)
         self.OptionMenu_year.set("Choose Year")
@@ -100,13 +102,13 @@ class App(customtkinter.CTk):
         self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
         self.Button_edit_customer.grid(row=3, column=0, padx=30)
 
-        self.Tabview_inner = customtkinter.CTkTabview(self.Frame_sidebar_customers, width=125)
+        self.Tabview_inner = customtkinter.CTkTabview(self.Frame_sidebar_customers, width=140)
         self.Tabview_inner.grid(row=4, column=0, rowspan=10, sticky="nsew", pady=(30,0))
         self.Tabview_inner.add("Get Bill")
         self.Tabview_inner.add("View Transactions")
 
         # get transactions by data range
-        self.Frame_transactions = customtkinter.CTkFrame(self.Tabview_inner.tab("View Transactions"), width=125, corner_radius=0)
+        self.Frame_transactions = customtkinter.CTkFrame(self.Tabview_inner.tab("View Transactions"), width=140, corner_radius=0)
         self.Frame_transactions.grid(row=0, column=0, rowspan=5, sticky="nsew")
         self.Frame_transactions.grid_rowconfigure(5, weight=1)
 
@@ -131,10 +133,62 @@ class App(customtkinter.CTk):
         self.DateEntry_label2.grid(row=3, column=0)
         self.Button_customer_submit.grid(row=4, column=0, pady=20)
 
+
         # get bill by month/year
-        self.Frame_bill = customtkinter.CTkFrame(self.Tabview_inner.tab("Get Bill"), width=125, corner_radius=0)
+        self.Frame_bill = customtkinter.CTkFrame(self.Tabview_inner.tab("Get Bill"), width=140, corner_radius=0)
         self.Frame_bill.grid(row=0, column=0, rowspan=5, sticky="nsew")
         self.Frame_bill.grid_rowconfigure(5, weight=1)
+
+        # year dropdown
+        self.Label_year_bill = customtkinter.CTkLabel(self.Frame_bill, text="Year:", state="disabled", text_color_disabled="grey")
+        self.OptionMenu_year_bill = customtkinter.CTkOptionMenu(self.Frame_bill, values=year_list, state="disabled")
+        self.OptionMenu_year_bill.set("Choose Year")
+
+        # month dropdown
+        self.Label_month_bill = customtkinter.CTkLabel(self.Frame_bill, text="Month:", state="disabled", text_color_disabled="grey")
+        self.OptionMenu_month_bill = customtkinter.CTkOptionMenu(self.Frame_bill, values=MONTHS, state="disabled")
+        self.OptionMenu_month_bill.set("Choose Month")
+        self.Button_submit_bill = customtkinter.CTkButton(self.Frame_bill, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled", command=self.generate_bill)
+        
+
+        self.Label_year_bill.grid(row=0, column=0, padx=28, pady=(10, 0), ipady=0)
+        self.OptionMenu_year_bill.grid(row=1, column=0, padx=28, pady=(0, 10))
+        self.Label_month_bill.grid(row=2, column=0, padx=28, pady=(10, 0), ipady=0)
+        self.OptionMenu_month_bill.grid(row=3, column=0, padx=28, pady=(0, 10))
+        self.Button_submit_bill.grid(row=4, column=0, padx=28, pady=20)
+
+
+        
+    def generate_bill(self):
+        self.Textbox_output.configure(state="normal")
+        month_name = self.OptionMenu_month_bill.get()
+        year = self.OptionMenu_year_bill.get()
+        missing = []
+        if year == "Choose Year":
+                missing.append("- select year")
+        if month_name == "Choose Month":
+            missing.append("- select month")
+        else:
+            month = str(MONTHS.index(month_name) + 1)
+            if len(month) == 1 : month = "0" + month
+            print(month)
+        if len(missing) > 0:
+            message = "INVALID QUERY:\n"
+            for error in missing:
+                message += error + "\n"
+                self.Textbox_output.delete(0.0, 'end')
+                self.Textbox_output.insert(text=message, index=0.0)
+                self.Textbox_output.configure(text_color="red")
+        else:
+            self.Textbox_output.configure(text_color="white")
+            self.Textbox_output.delete(0.0, 'end')
+            results = util.GUI_util.get_bills(month, year, self.selected_customer)
+            text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n"
+            self.Textbox_output.insert(text=results, index=0.0)
+            self.Textbox_output.insert(text=text, index=0.0)
+
+        self.Textbox_output.configure(state="disabled")
+
 
         
     def submit_parameters(self):
@@ -147,7 +201,8 @@ class App(customtkinter.CTk):
         if month_name == "Choose Month":
             missing.append("- select month")
         else:
-            month = str(MONTHS.index(month_name))
+            month = str(MONTHS.index(month_name) + 1)
+            if len(month) == 1 : month = "0" + month
         zip = self.Entry_zip.get()
         if zip == "":
             missing.append("- zip code field cannot be empty")
@@ -197,8 +252,6 @@ class App(customtkinter.CTk):
 
     def open_popup(self, customer_id):
         top= customtkinter.CTkToplevel(self)
-
-
         top.geometry("350x200")
         top.title("Customer Lookup")
         message = "Is this the correct customer?\n"
@@ -212,6 +265,8 @@ class App(customtkinter.CTk):
             top.destroy()
             top.update()
             self.selected_customer = customer
+
+            # enable transaction search
             self.Label_find_customer.configure(text = customer[1] + " " + customer[2] + " " + customer[3] + "\n")
             self.Button_edit_customer.configure(state="normal")
             self.DateEntry_label1.configure(state="normal")
@@ -219,6 +274,19 @@ class App(customtkinter.CTk):
             self.Button_customer_submit.configure(state="normal")
             self.DateEntry_2.configure(state="normal")
             self.DateEntry_label2.configure(state="normal")
+
+            # enable bill search
+           # self.Frame_bill.configure(state="normal")
+
+            # year dropdown
+            self.Label_year_bill.configure(state="normal")
+            self.OptionMenu_year_bill.configure(state="normal")
+
+            # month dropdown
+            self.Label_month_bill.configure(state="normal")
+            self.OptionMenu_month_bill.configure(state="normal")
+            self.Button_submit_bill.configure(state="normal")
+        
 
         def deny_button():
             top.destroy()
@@ -230,8 +298,6 @@ class App(customtkinter.CTk):
         decline = customtkinter.CTkButton(top, text="No", width=30, command=deny_button)
         confirm.place(x=125, y=175)
         decline.place(x=175, y=175)
-
-
 
     def open_popup_search(self):
         top= customtkinter.CTkToplevel(self)

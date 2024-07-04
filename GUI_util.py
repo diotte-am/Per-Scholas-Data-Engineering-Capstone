@@ -119,7 +119,7 @@ class GUI_util():
             
             return final.values
         
-    def get_years(self):
+    def get_years():
         conn = None
         query = "SELECT DISTINCT Year FROM CDW_SAPP_PERIOD"
         try: 
@@ -142,7 +142,7 @@ class GUI_util():
 
 
 
-            return year_list
+        return year_list
         
     def get_all_CUST_IDs(self):
         conn = None
@@ -182,6 +182,30 @@ class GUI_util():
         except Error as e:
             print("Conection failed!", e)
         return result
+    
+    def get_bills(month, year, selected_customer):
+        customer_id = selected_customer[13]
+        conn = None
+        query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer_id) + " AND CAST(TIMEID AS CHAR) LIKE '" + year + month + "__'"
+        print(query)
+        try:
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                result = cursor.fetchall()
+                id_list = []
+                for row in result:
+                    id_list.append(str(row[4]))
+                conn.close()
+                                  
+        except Error as e:
+            print("Conection failed!", e)
+        return id_list
+
+        
 
     
 
