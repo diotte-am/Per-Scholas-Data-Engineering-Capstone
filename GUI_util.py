@@ -158,7 +158,6 @@ class GUI_util():
                 id_list = []
                 for row in results:
                     id_list.append(str(row[0]))
-
                 conn.close()
                                   
         except Error as e:
@@ -183,11 +182,11 @@ class GUI_util():
             print("Conection failed!", e)
         return result
     
-    def get_bills(month, year, selected_customer):
+    def get_bills(self, month, year, selected_customer):
         customer_id = selected_customer[13]
         conn = None
         query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer_id) + " AND CAST(TIMEID AS CHAR) LIKE '" + year + month + "__'"
-        print(query)
+
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
 
@@ -205,6 +204,8 @@ class GUI_util():
             print("Conection failed!", e)
         return id_list
 
+    def query_timespan(self, start, end, customer):
+        return start, end, customer[13]
         
 
     

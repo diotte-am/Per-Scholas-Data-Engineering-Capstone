@@ -116,16 +116,13 @@ class App(customtkinter.CTk):
         self.DateEntry_1 = DateEntry(
             self.Frame_transactions, 
             date_pattern="yyyy-mm-dd", 
-            state="disabled", 
-            day=1,
-            month=1,
-            year=2018
+            state="disabled"
             )
 
         self.DateEntry_label2 = customtkinter.CTkLabel(self.Frame_transactions, text="End Date", state="disabled", text_color_disabled="grey")
         self.DateEntry_2 = DateEntry(self.Frame_transactions, date_pattern="yyyy-mm-dd", state="disabled")
 
-        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled")
+        self.Button_customer_submit = customtkinter.CTkButton(self.Frame_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled", command=self.query_timespan)
 
         self.DateEntry_label1.grid(row=0, column=0, padx=30, pady=(10, 0), ipady=0)
         self.DateEntry_1.grid(row=1, column=0, padx=30, pady=(10, 0))
@@ -157,6 +154,15 @@ class App(customtkinter.CTk):
         self.OptionMenu_month_bill.grid(row=3, column=0, padx=28, pady=(0, 10))
         self.Button_submit_bill.grid(row=4, column=0, padx=28, pady=20)
 
+    def query_timespan(self):
+        self.Textbox_output.configure(state="normal")
+        start_date = str(self.DateEntry_1.get_date()).replace("-", "")
+        end_date = str(self.DateEntry_2.get_date()).replace("-", "")
+        results = self.util.query_timespan(start_date, end_date, self.selected_customer)
+        self.Textbox_output.configure(text_color="white")
+        self.Textbox_output.delete(0.0, 'end')
+        self.Textbox_output.insert(text=results, index=0.0)
+        self.Textbox_output.configure(state="disabled")
 
         
     def generate_bill(self):
@@ -182,15 +188,13 @@ class App(customtkinter.CTk):
         else:
             self.Textbox_output.configure(text_color="white")
             self.Textbox_output.delete(0.0, 'end')
-            results = util.GUI_util.get_bills(month, year, self.selected_customer)
+            results = self.util.get_bills(month, year, self.selected_customer)
             text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n"
             self.Textbox_output.insert(text=results, index=0.0)
             self.Textbox_output.insert(text=text, index=0.0)
 
         self.Textbox_output.configure(state="disabled")
 
-
-        
     def submit_parameters(self):
         self.Textbox_output.configure(state="normal")
         year = self.OptionMenu_year.get()
