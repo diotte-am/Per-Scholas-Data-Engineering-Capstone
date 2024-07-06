@@ -2,14 +2,34 @@ import tkinter
 import tkinter.messagebox
 import customtkinter
 import GUI_util as util
+from Customer import Customer
 from TBL_NAME import TBL_NAME
 from tkcalendar import Calendar, DateEntry
 import datetime
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
+
 year_list = util.GUI_util.get_years()
+
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+customer_dict = {
+    "SSN": "Social Security Number", 
+    "FIRST_NAME": "First Name", 
+    "MIDDLE_NAME": "Middle Name", 
+    "LAST_NAME": "Last Name", 
+    "CREDIT_CARD_NO": "Credit Card Number",
+    "FULL_STREET_ADDRESS": "Street Address", 
+    "CUST_CITY": "City", 
+    "CUST_STATE": "State", 
+    "CUST_COUNTRY": "Country", 
+    "CUST_ZIP": "Zip Code", 
+    "CUST_PHONE": "Phone Number",
+    "CUST_EMAIL": "Email Address",
+    "LAST_UPDATED": "Last Updated",
+    "CUST_ID": "Customer ID"
+    }
 
         
 class App(customtkinter.CTk):
@@ -19,7 +39,6 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.util = util.GUI_util()
-        self.selected_customer = []
 
         # configure window
         self.title("creditcard_capstone Query")
@@ -95,7 +114,7 @@ class App(customtkinter.CTk):
 
         self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer", command=self.lookup_id)
         self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
-        self.Button_edit_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Edit customer", state="disabled")
+        self.Button_edit_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Edit customer", state="disabled", command=self.edit_customer)
 
         self.Label_find_customer.grid(row=0, column=0, padx=30, pady=20)
         self.Entry_find_customer.grid(row=1, column=0, padx=30, ipady=0)
@@ -259,28 +278,24 @@ class App(customtkinter.CTk):
         top.geometry("350x200")
         top.title("Customer Lookup")
         message = "Is this the correct customer?\n"
-        customer = self.util.get_customer(customer_id)
-        message += customer[1] + " " + customer[2] + " " + customer[3] + "\n"
-        message += customer[5] + "\n" + customer[6] + ", " + customer[7] + ", " + customer[8] + ", " + customer[9] + "\n"
-        message += "Phone: " + customer[10] + "\n"
-        message += "Email: " + customer[11] + "\n"
-        customtkinter.CTkLabel(top, text= message).place(x=150,y=50)
+        customer_data = self.util.get_customer(customer_id)
+        customer = Customer(customer_data)
+        message = customer.customer_summary()
+        customtkinter.CTkLabel(top, text= message).place(x=50,y=50)
+
         def confirm_button():
             top.destroy()
             top.update()
             self.selected_customer = customer
 
             # enable transaction search
-            self.Label_find_customer.configure(text = customer[1] + " " + customer[2] + " " + customer[3] + "\n")
+            self.Label_find_customer.configure(text = customer.full_name())
             self.Button_edit_customer.configure(state="normal")
             self.DateEntry_label1.configure(state="normal")
             self.DateEntry_1.configure(state="normal")
             self.Button_customer_submit.configure(state="normal")
             self.DateEntry_2.configure(state="normal")
             self.DateEntry_label2.configure(state="normal")
-
-            # enable bill search
-           # self.Frame_bill.configure(state="normal")
 
             # year dropdown
             self.Label_year_bill.configure(state="normal")
@@ -291,7 +306,6 @@ class App(customtkinter.CTk):
             self.OptionMenu_month_bill.configure(state="normal")
             self.Button_submit_bill.configure(state="normal")
         
-
         def deny_button():
             top.destroy()
             top.update()
@@ -305,10 +319,66 @@ class App(customtkinter.CTk):
 
     def open_popup_search(self):
         top= customtkinter.CTkToplevel(self)
-        top.geometry("750x250")
+        top.geometry("600x250")
         top.title("Search for customer ID")
-        customer_id = "enter query info"
+        customer_id = "Customer ID not found!\nContact administrator for assistance"
         customtkinter.CTkLabel(top, text= customer_id).place(x=150,y=80)
+
+    def on_change(self, var_name, index, mode):
+        widget = self.widgets[var_name]
+        self.selected_customer.dict[var_name] = widget.get()
+        
+
+
+
+    def submit_edit(self):
+        self.util.edit_query(self.selected_customer)
+        
+    def edit_customer(self):
+        self.widgets = {}
+        top = customtkinter.CTkToplevel(self)
+        top.geometry("750x250")
+        top.title("Edit customer details")
+        top.grid_rowconfigure(0, weight=1)
+        top.grid_columnconfigure(0, weight=1)
+
+        self.Frame_edit = customtkinter.CTkFrame(top)
+        self.Frame_edit.grid(row=0, column=0, sticky="nsew", ipadx=10)
+
+        self.Frame_edit.grid_rowconfigure([0,1,2,3,4,5,6], weight=1)
+        self.Frame_edit.grid_columnconfigure([0,1,2,3], weight=1)
+
+        row = 0
+        column = 0
+        for k, v in customer_dict.items():
+            if k != "SSN" and k != "LAST_UPDATED":
+                entry_value = str(self.selected_customer.dict[k])
+                var = customtkinter.StringVar(name=k, value=entry_value)
+                var.trace_add('write', self.on_change)
+                label = customtkinter.CTkLabel(self.Frame_edit, text=v)
+                self.widgets[k] = customtkinter.CTkEntry(self.Frame_edit, textvariable=var, width=150)
+                label.grid(row=(row % 6), column=(column // 3), sticky='s')
+                self.widgets[k].grid(row=(row % 6)+1, column=(column // 3), sticky='n')
+                if k == "CREDIT_CARD_NO":
+                    var.set("**** **** **** " + entry_value[12:])
+                    self.widgets[k].configure(state="disabled")
+                if k == "CUST_ID":
+                    self.widgets[k].configure(state="disabled")
+                    
+                
+                row += 2
+                column += 1
+                
+
+        submit_button = customtkinter.CTkButton(self.Frame_edit, text="Submit", command=self.submit_edit)
+        submit_button.grid(row=6, columnspan=2, column=1, pady=20)
+            
+
+        
+
+        
+
+
 
 
         

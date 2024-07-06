@@ -183,7 +183,7 @@ class GUI_util():
         return result
     
     def get_bills(self, month, year, selected_customer):
-        customer_id = selected_customer[13]
+        customer_id = selected_customer.get_id()
         conn = None
         query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer_id) + " AND CAST(TIMEID AS CHAR) LIKE '" + year + month + "__'"
 
@@ -205,7 +205,12 @@ class GUI_util():
         return id_list
 
     def query_timespan(self, start, end, customer):
-        return start, end, customer[13]
+        return start, end, customer.get_id()
+    
+    def edit_query(self, customer):
+        query = "UPDATE CDW_SAPP_CUSTOMER SET " + customer.get_edit_query() + " WHERE CUST_ID = " + str(customer.get_id()) 
+        print(query)
+        return query
         
 
     
