@@ -6,6 +6,7 @@ import calendar
 import pandas as pd
 from tabulate import tabulate
 
+
 class GUI_util():
     def __init__(self):
         self.current_table = TBL_NAME.CREDIT
@@ -195,22 +196,64 @@ class GUI_util():
                 cursor = conn.cursor()
                 cursor.execute(query)
                 result = cursor.fetchall()
-                id_list = []
+                string = ""
+                sum = 0
                 for row in result:
-                    id_list.append(str(row[4]))
+                    for column in ("Trans. ID", "Date", "Type", "Cost"):
+                        string += column + "\t"
+                    string += "\n" + str(row[5]) + "\t" + str(row[1])[-2:] + "\t" + str(row[3]) + "\t" + str(row[4]) + "\n\n"
+                    sum += row[4]
+                
                 conn.close()
                                   
         except Error as e:
             print("Conection failed!", e)
-        return id_list
+        string += "\n" + "Total bill: $" +  str(round(sum, 2))
+        return string
 
     def query_timespan(self, start, end, customer):
-        return start, end, customer.get_id()
+        query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer["CUST_ID"]) + " AND TIMEID BETWEEN " + start + " AND " + end
+        try:
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                result = cursor.fetchall()
+                string = ""
+
+
+                for row in result:
+                    for column in ("Date", "Cust ID", "Type", "Cost", "Trans. ID", "Branch ID"):
+                        string += column + "\t"
+                    string += "\n" + str(row[1]) + "\t" + str(row[2]) + "\t" + str(row[3]) + "\t" + str(row[4]) + "\t" + str(row[5]) + "\t" + str(row[6]) + "\n\n"
+                conn.close()
+                                  
+        except Error as e:
+            result = ("Conection failed!", e)
+        
+        return string
+
+
+
     
     def edit_query(self, customer):
         query = "UPDATE CDW_SAPP_CUSTOMER SET " + customer.get_edit_query() + " WHERE CUST_ID = " + str(customer.get_id()) 
-        print(query)
-        return query
+        try:
+            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+
+            if conn.is_connected():
+                print('Connected to MySQL database')
+                cursor = conn.cursor()
+                cursor.execute(query)
+                conn.commit()
+                string = ""
+                result = [string.__add__(x) for x in customer]
+        except Error as e:
+           result = "Conection failed! " + e
+
+        return result
         
 
     

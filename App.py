@@ -213,7 +213,7 @@ class App(customtkinter.CTk):
             self.Textbox_output.configure(text_color="white")
             self.Textbox_output.delete(0.0, 'end')
             results = self.util.get_bills(month, year, self.selected_customer)
-            text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n"
+            text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n\n"
             self.Textbox_output.insert(text=results, index=0.0)
             self.Textbox_output.insert(text=text, index=0.0)
 
