@@ -61,3 +61,8 @@ class Customer():
                 else:
                     string += str(item) + " = '" + str(self.dict[item]) + "', "
         return string
+    
+    def print_fields(self):
+        for item in dict.keys():
+            print(item)
+

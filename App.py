@@ -181,7 +181,8 @@ class App(customtkinter.CTk):
         self.Textbox_output.configure(state="normal")
         start_date = str(self.DateEntry_1.get_date()).replace("-", "")
         end_date = str(self.DateEntry_2.get_date()).replace("-", "")
-        results = self.util.query_timespan(start_date, end_date, self.selected_customer)
+        results = self.selected_customer.full_name() + "\n" + "Transactions between " + self.DateEntry_1.get_date().strftime("%m/%d/%Y") + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y") + "\n"
+        results += self.util.query_timespan(start_date, end_date, self.selected_customer.dict)
         self.Textbox_output.configure(text_color="white")
         self.Textbox_output.delete(0.0, 'end')
         self.Textbox_output.insert(text=results, index=0.0)
