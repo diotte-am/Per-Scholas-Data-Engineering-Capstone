@@ -1,3 +1,5 @@
+from datetime import date
+
 customer_dict = {
     "SSN": (0, "Social Security Number"), 
     "FIRST_NAME": (1, "First Name"), 
@@ -51,4 +53,11 @@ class Customer():
         return name
     
     def get_edit_query(self):
-        return "FIRST_NAME = " + self.dict["FIRST_NAME"]
+        string = ""
+        for item in customer_dict.keys():
+            if item not in ("CREDIT_CARD_NO", "CUST_ID", "SSN"):
+                if item == "LAST_UPDATED":
+                    string += str(item) + " = '" + str(date.today()) + "' "
+                else:
+                    string += str(item) + " = '" + str(self.dict[item]) + "', "
+        return string

@@ -67,7 +67,7 @@ class App(customtkinter.CTk):
         ''' 
 
         # transaction sidebar
-        self.Frame_sidebar_transactions = customtkinter.CTkFrame(self.Tabview.tab("Transactions"), width=140, corner_radius=0)
+        self.Frame_sidebar_transactions = customtkinter.CTkFrame(self.Tabview.tab("Transactions"), width=150, corner_radius=0)
         self.Frame_sidebar_transactions.grid(row=0, column=0, rowspan=10, sticky="nsew")
         self.Frame_sidebar_transactions.grid_rowconfigure(10, weight=1)
 
@@ -103,9 +103,10 @@ class App(customtkinter.CTk):
         # Customers sidebar
         # add customer button, if customer is not selected, the options are
         
-        self.Frame_sidebar_customers = customtkinter.CTkFrame(self.Tabview.tab("Customers"), width=140, corner_radius=0)
+        self.Frame_sidebar_customers = customtkinter.CTkFrame(self.Tabview.tab("Customers"), width=150, corner_radius=0)
         self.Frame_sidebar_customers.grid(row=0, column=0, rowspan=10, sticky="nsew")
-        self.Frame_sidebar_customers.grid_rowconfigure(10, weight=1)
+        self.Frame_sidebar_customers.grid_rowconfigure([0,10], weight=1)
+        self.Frame_sidebar_customers.grid_columnconfigure(0, weight=1)
 
         self.Label_find_customer = customtkinter.CTkLabel(
             self.Frame_sidebar_customers, 
@@ -121,15 +122,18 @@ class App(customtkinter.CTk):
         self.Button_find_customer.grid(row=2, column=0, padx=30, pady=10)
         self.Button_edit_customer.grid(row=3, column=0, padx=30)
 
-        self.Tabview_inner = customtkinter.CTkTabview(self.Frame_sidebar_customers, width=140)
+        self.Tabview_inner = customtkinter.CTkTabview(self.Frame_sidebar_customers, width=100)
         self.Tabview_inner.grid(row=4, column=0, rowspan=10, sticky="nsew", pady=(30,0))
+        self.Tabview_inner.grid_columnconfigure(0, weight=1)
         self.Tabview_inner.add("Get Bill")
         self.Tabview_inner.add("View Transactions")
 
         # get transactions by data range
-        self.Frame_transactions = customtkinter.CTkFrame(self.Tabview_inner.tab("View Transactions"), width=140, corner_radius=0)
-        self.Frame_transactions.grid(row=0, column=0, rowspan=5, sticky="nsew")
+        self.Frame_transactions = customtkinter.CTkFrame(self.Tabview_inner.tab("View Transactions"), width=125, corner_radius=0)
+        self.Frame_transactions.grid(row=0, column=0, rowspan=5)
         self.Frame_transactions.grid_rowconfigure(5, weight=1)
+        self.Frame_transactions.grid_columnconfigure(0, weight=1)
+        
 
         self.DateEntry_label1 = customtkinter.CTkLabel(self.Frame_transactions, text="Start Date", state="disabled", text_color_disabled="grey")
         self.DateEntry_1 = DateEntry(
@@ -143,15 +147,15 @@ class App(customtkinter.CTk):
 
         self.Button_customer_submit = customtkinter.CTkButton(self.Frame_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled", command=self.query_timespan)
 
-        self.DateEntry_label1.grid(row=0, column=0, padx=30, pady=(10, 0), ipady=0)
-        self.DateEntry_1.grid(row=1, column=0, padx=30, pady=(10, 0))
-        self.DateEntry_2.grid(row=2, column=0, padx=30, pady=(20, 0))
+        self.DateEntry_label1.grid(row=0, column=0, padx=25, pady=(10, 0), ipady=0, sticky="ew")
+        self.DateEntry_1.grid(row=1, column=0, padx=25, pady=(10, 0))
+        self.DateEntry_2.grid(row=2, column=0, padx=25, pady=(20, 0))
         self.DateEntry_label2.grid(row=3, column=0)
-        self.Button_customer_submit.grid(row=4, column=0, pady=20)
+        self.Button_customer_submit.grid(row=4, column=0, padx=25, pady=20)
 
 
         # get bill by month/year
-        self.Frame_bill = customtkinter.CTkFrame(self.Tabview_inner.tab("Get Bill"), width=140, corner_radius=0)
+        self.Frame_bill = customtkinter.CTkFrame(self.Tabview_inner.tab("Get Bill"), width=100, corner_radius=0)
         self.Frame_bill.grid(row=0, column=0, rowspan=5, sticky="nsew")
         self.Frame_bill.grid_rowconfigure(5, weight=1)
 
@@ -167,11 +171,11 @@ class App(customtkinter.CTk):
         self.Button_submit_bill = customtkinter.CTkButton(self.Frame_bill, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", state="disabled", command=self.generate_bill)
         
 
-        self.Label_year_bill.grid(row=0, column=0, padx=28, pady=(10, 0), ipady=0)
-        self.OptionMenu_year_bill.grid(row=1, column=0, padx=28, pady=(0, 10))
-        self.Label_month_bill.grid(row=2, column=0, padx=28, pady=(10, 0), ipady=0)
-        self.OptionMenu_month_bill.grid(row=3, column=0, padx=28, pady=(0, 10))
-        self.Button_submit_bill.grid(row=4, column=0, padx=28, pady=20)
+        self.Label_year_bill.grid(row=0, column=0, padx=25, pady=(10, 0), ipady=0)
+        self.OptionMenu_year_bill.grid(row=1, column=0, padx=25, pady=(0, 10))
+        self.Label_month_bill.grid(row=2, column=0, padx=25, pady=(10, 0), ipady=0)
+        self.OptionMenu_month_bill.grid(row=3, column=0, padx=25, pady=(0, 10))
+        self.Button_submit_bill.grid(row=4, column=0, padx=25, pady=20)
 
     def query_timespan(self):
         self.Textbox_output.configure(state="normal")
@@ -281,7 +285,7 @@ class App(customtkinter.CTk):
         customer_data = self.util.get_customer(customer_id)
         customer = Customer(customer_data)
         message = customer.customer_summary()
-        customtkinter.CTkLabel(top, text= message).place(x=50,y=50)
+        customtkinter.CTkLabel(top, text= message).place(x=75,y=35)
 
         def confirm_button():
             top.destroy()
@@ -314,8 +318,8 @@ class App(customtkinter.CTk):
 
         confirm = customtkinter.CTkButton(top, text="Yes", width=30, command=confirm_button)
         decline = customtkinter.CTkButton(top, text="No", width=30, command=deny_button)
-        confirm.place(x=125, y=175)
-        decline.place(x=175, y=175)
+        confirm.place(x=130, y=150)
+        decline.place(x=180, y=150)
 
     def open_popup_search(self):
         top= customtkinter.CTkToplevel(self)
@@ -332,7 +336,9 @@ class App(customtkinter.CTk):
 
 
     def submit_edit(self):
+        self.current_top.destroy()
         self.util.edit_query(self.selected_customer)
+        
         
     def edit_customer(self):
         self.widgets = {}
@@ -347,6 +353,7 @@ class App(customtkinter.CTk):
 
         self.Frame_edit.grid_rowconfigure([0,1,2,3,4,5,6], weight=1)
         self.Frame_edit.grid_columnconfigure([0,1,2,3], weight=1)
+        self.current_top = top
 
         row = 0
         column = 0
