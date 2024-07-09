@@ -23,7 +23,6 @@ def runETL() -> None:
     print("Program completed")
 
 def runApp() -> None:
-    program_running = True
     app = App()
     app.mainloop()
 

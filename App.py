@@ -37,7 +37,7 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-
+        print(year_list)
         self.util = util.GUI_util()
 
         # configure window
@@ -181,7 +181,7 @@ class App(customtkinter.CTk):
         self.Textbox_output.configure(state="normal")
         start_date = str(self.DateEntry_1.get_date()).replace("-", "")
         end_date = str(self.DateEntry_2.get_date()).replace("-", "")
-        results = self.selected_customer.full_name() + "\n" + "Transactions between " + self.DateEntry_1.get_date().strftime("%m/%d/%Y") + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y") + "\n"
+        results = self.selected_customer.full_name() + "\n" + "Transactions between " + self.DateEntry_1.get_date().strftime("%m/%d/%Y") + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y") + "\n\n"
         results += self.util.query_timespan(start_date, end_date, self.selected_customer.dict)
         self.Textbox_output.configure(text_color="white")
         self.Textbox_output.delete(0.0, 'end')
@@ -201,7 +201,6 @@ class App(customtkinter.CTk):
         else:
             month = str(MONTHS.index(month_name) + 1)
             if len(month) == 1 : month = "0" + month
-            print(month)
         if len(missing) > 0:
             message = "INVALID QUERY:\n"
             for error in missing:
