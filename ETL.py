@@ -106,7 +106,6 @@ class jsonETL(ETL):
         temp = spark.sql(schema.main[TBL_NAME.PERIOD.value])
         df_dict[TBL_NAME.PERIOD.value] = temp
 
-        print(df_dict)
         return df_dict
     
     def create_db(self):
@@ -133,7 +132,6 @@ class jsonETL(ETL):
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
 
             if conn.is_connected():
-                print('Connected to MySQL database')
                 # Get a cursor
                 cursor = conn.cursor()
                 for k,v in schema.pk.items():
