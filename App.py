@@ -33,8 +33,6 @@ customer_dict = {
 
         
 class App(customtkinter.CTk):
-    
-
     def __init__(self):
         super().__init__()
         print(year_list)
@@ -249,7 +247,8 @@ class App(customtkinter.CTk):
             util.GUI_util.set_table(util.GUI_util, TBL_NAME.CREDIT)
             results = util.GUI_util.all_details(util.GUI_util,
                                       [zip, month, year])
-            results = util.GUI_util.extract_fields(util.GUI_util, results)
+            print(results)
+            results = util.GUI_util.extract_fields(util.GUI_util, results.values)
             if len(results) < 1:
                 string = "No results found."
             else:

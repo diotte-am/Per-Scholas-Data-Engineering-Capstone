@@ -118,6 +118,8 @@ class jsonETL(ETL):
                 print('Connected to MySQL database')
                 # Get a cursor
                 cursor = conn.cursor()
+                query = "DROP DATABASE IF EXISTS creditcard_capstone"
+                cursor.execute(query)
                 query = "CREATE DATABASE IF NOT EXISTS creditcard_capstone"
                 cursor.execute(query)
                 conn.close()

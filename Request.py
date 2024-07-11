@@ -6,7 +6,7 @@ from mysql.connector import Error
 import my_secrets
 import schema
 
-class ETL_API():
+class Request():
     api_url = "https://raw.githubusercontent.com/platformps/LoanDataset/main/loan_data.json"
     spark = SparkSession.builder.appName('Bank_Analysis').getOrCreate()
     response = requests.get(api_url)
@@ -15,6 +15,19 @@ class ETL_API():
     spark = SparkSession.getActiveSession()
     df = spark.createDataFrame(data=response.json())
     table_name = "CDW_SAPP_CREDIT_APPLICATION"
+
+    conn = None
+    try: 
+        conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
+        if conn.is_connected():
+            # Get a cursor
+            cursor = conn.cursor()
+
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            conn.close()
+                
+    except Error as e:
+        print("Conection failed!", e)
     
     df = df.withColumns({
         "Married": col("Married").cast('boolean'),
@@ -23,7 +36,6 @@ class ETL_API():
         "A_ID": substring(col("Application_ID"), 3, 6).cast("int")
     })
 
-    spark.sql(f"DROP TABLE IF EXISTS {table_name}")
     try:
         df.write.format("jdbc") \
                 .mode("append") \
@@ -48,4 +60,6 @@ class ETL_API():
     except Error as e:
         print("Conection failed!", e)
 
-app = ETL_API()
+
+    def confirm(self):
+        print("Data uploaded!")

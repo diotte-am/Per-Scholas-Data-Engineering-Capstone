@@ -11,6 +11,7 @@ from ETL import *
 import typing
 
 from App import App
+from Request import Request
 
 INPUT_TYPES = "json"
 
@@ -18,6 +19,8 @@ def runETL() -> None:
     # create the SparkSession
     spark = SparkSession.builder.appName('Bank_Analysis').getOrCreate()
     ETLpipeline = jsonETL()
+    loadAPI = Request()
+    loadAPI.confirm()
     ETLpipeline.run()
     spark.stop()
     print("Program completed")
@@ -27,7 +30,7 @@ def runApp() -> None:
     app.mainloop()
 
 def main():
-    #runETL()
+    runETL()
     runApp()
 
 if __name__ == "__main__":
