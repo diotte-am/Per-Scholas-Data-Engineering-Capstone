@@ -5,7 +5,7 @@ findspark.init()
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType
-
+from Graph import Graph
 
 from ETL import *
 import typing
@@ -22,6 +22,8 @@ def runETL() -> None:
     loadAPI = Request()
     loadAPI.confirm()
     ETLpipeline.run()
+  #  graphics = Graph()
+  #  graphics.create_viz()
     spark.stop()
     print("Program completed")
 

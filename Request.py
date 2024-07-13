@@ -63,3 +63,5 @@ class Request():
 
     def confirm(self):
         print("Data uploaded!")
+
+d = Request()
