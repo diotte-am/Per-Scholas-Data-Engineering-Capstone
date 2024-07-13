@@ -2,17 +2,11 @@ import mysql.connector as dbconnect
 from mysql.connector import Error
 import my_secrets
 from TBL_NAME import TBL_NAME
-import calendar
 import pandas as pd
-from tabulate import tabulate
-
 
 class GUI_util():
     def __init__(self):
         self.current_table = TBL_NAME.CREDIT
-     
-    def test(self):
-          print("yo!")
     
     def build_query(self):
         if self.current_table == TBL_NAME.CREDIT:
@@ -49,41 +43,32 @@ class GUI_util():
                 else:
                     print("Invalid input, must be a number!")
             
-        # query = where customer.zip = input_zip AND CONCAT(year, month) LIKE credit.TIMEID[0:6]
         return input_zip, input_month, input_year
     
     def all_details(self, inputs):
         if self.current_table == TBL_NAME.CUST:
             query = "SELECT * FROM CDW_SAPP_CUSTOMER"
-            
         elif self.current_table == TBL_NAME.CREDIT:
-            query = "SELECT *, SUBSTRING(CREDIT.TIMEID, 7) AS DAY FROM CDW_SAPP_CREDIT AS CREDIT\
+            query = "SELECT *, SUBSTRING(CREDIT.TIMEID, 7) AS DAY\
+                FROM CDW_SAPP_CREDIT AS CREDIT\
                 JOIN CDW_SAPP_BRANCH AS BRANCH ON CREDIT.BRANCH_CODE = BRANCH.BRANCH_CODE\
                 WHERE SUBSTRING(CREDIT.TIMEID, 1, 6) = " + inputs[2] + inputs[1] + " AND \
                 BRANCH.BRANCH_ZIP = " + inputs[0] + " ORDER BY DAY DESC"
-
         conn = None
         try: 
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
 
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                df = cursor.fetchall()
-
+                df = pd.read_sql(query, conn)
                 conn.close()
                 return df
                         
         except Error as e:
             print("Conection failed!", e)
-        
-        
-    
-    def set_table(self, table_name: TBL_NAME):
-        self.current_table = table_name
-    
+
+
     def extract_fields(self, results: list[str]):
+        print(results)
         if self.current_table == TBL_NAME.CUST:
             for row in results:
                 full_name = " ".join([row[1], row[2], row[3]])
@@ -96,8 +81,7 @@ class GUI_util():
                 zip = row[9]
                 phone = row[10]
                 email = row[11]
-                print(full_name, ssn_redacted, cc_redacted, street, city, state, country, zip, phone, email)
-
+                
         elif self.current_table == TBL_NAME.CREDIT:
             final = pd.DataFrame(columns=["credit card number", "transaction time", "branch code", "transaction type", "transaction value", "transaction id"])
             for row in results:
@@ -117,71 +101,52 @@ class GUI_util():
                     })
                 
                 final = pd.concat([temp, final], ignore_index=True)
-            
+
             return final.values
+        
+    def set_table(self, table_name: TBL_NAME):
+        self.current_table = table_name
+
         
     def get_years():
         conn = None
-        query = "SELECT DISTINCT Year FROM CDW_SAPP_PERIOD"
+        query = "SELECT DISTINCT CAST(Year AS CHAR) AS YEAR FROM CDW_SAPP_PERIOD"
         try: 
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                results = cursor.fetchall()
-                year_list = []
-                for row in results:
-                    year_list.append(str(row[0]))
-
+                year_df = pd.read_sql(query, conn)
                 conn.close()
-                                      
+                                    
         except Error as e:
             print("Conection failed!", e)
-        
-
-
-
-        return year_list
+        return year_df["YEAR"]
         
     def get_all_CUST_IDs(self):
         conn = None
-        query = "SELECT CUST_ID FROM CDW_SAPP_CUSTOMER"
+        query = "SELECT DISTINCT CAST(CUST_ID AS CHAR) AS CUST FROM CDW_SAPP_CUSTOMER"
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                results = cursor.fetchall()
-                id_list = []
-                for row in results:
-                    id_list.append(str(row[0]))
+                id_list = pd.read_sql(query, conn)
                 conn.close()
                                   
         except Error as e:
             print("Conection failed!", e)
-        return id_list
+        return id_list.values
     
     def get_customer(self, cust_id):
         conn = None
         query = "SELECT * FROM CDW_SAPP_CUSTOMER WHERE CUST_ID = " + cust_id
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                result = cursor.fetchone()
-
+                cust_list = pd.read_sql(query, conn)
                 conn.close()
                                   
         except Error as e:
             print("Conection failed!", e)
-        return result
+
+        return cust_list.values[0]
     
     def get_bills(self, month, year, selected_customer):
         customer_id = selected_customer.get_id()
@@ -190,20 +155,15 @@ class GUI_util():
 
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                result = cursor.fetchall()
+                result = pd.read_sql(query, conn)
                 string = ""
                 sum = 0
-                for row in result:
+                for row in result.values:
                     for column in ("Trans. ID", "Date", "Type", "Cost"):
                         string += column + "\t"
                     string += "\n" + str(row[5]) + "\t" + str(row[1])[-2:] + "\t" + str(row[3]) + "\t" + str(row[4]) + "\n\n"
                     sum += row[4]
-                
                 conn.close()
                                   
         except Error as e:
@@ -212,44 +172,39 @@ class GUI_util():
         return string
 
     def query_timespan(self, start, end, customer):
-        query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer["CUST_ID"]) + " AND TIMEID BETWEEN " + start + " AND " + end
+        query = "SELECT * FROM CDW_SAPP_CREDIT JOIN CDW_SAPP_PERIOD ON CDW_SAPP_CREDIT.TIMEID = CDW_SAPP_PERIOD.TIMEID WHERE CUST_ID = " + str(customer["CUST_ID"]) + " AND CDW_SAPP_CREDIT.TIMEID BETWEEN " + start + " AND " + end + " ORDER BY CDW_SAPP_PERIOD.YEAR DESC, CDW_SAPP_PERIOD.MONTH DESC, CDW_SAPP_PERIOD.DAY DESC"
+        string1 = ""
+        string2 = ""
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
             if conn.is_connected():
-                print('Connected to MySQL database')
-                cursor = conn.cursor()
-                cursor.execute(query)
-                result = cursor.fetchall()
                 string = ""
-
-
-                for row in result:
-                    for column in ("Date", "Cust ID", "Type", "Cost", "Trans. ID", "Branch ID"):
-                        string += column + "\t"
-                    string += "\n" + str(row[1]) + "\t" + str(row[2]) + "\t" + str(row[3]) + "\t" + str(row[4]) + "\t" + str(row[5]) + "\t" + str(row[6]) + "\n\n"
-                conn.close()
-                                  
+                result = pd.read_sql(query, conn)
+                
+                   
+                conn.close() 
         except Error as e:
             result = ("Conection failed!", e)
-        
-        return string
+            
+        for index, item in result.iterrows():
+ 
+            string1 += "\n" + str(index) 
+            string2 += "\n" + str(item) + "\n"
+        print(string1, string2)
+        return result.to_string()
 
-
-
-    
     def edit_query(self, customer):
         query = "UPDATE CDW_SAPP_CUSTOMER SET " + customer.get_edit_query() + " WHERE CUST_ID = " + str(customer.get_id()) 
         try:
             conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
 
             if conn.is_connected():
-                print('Connected to MySQL database')
                 cursor = conn.cursor()
                 cursor.execute(query)
                 conn.commit()
+                
                 string = ""
-                result = [string.__add__(x) for x in customer]
+                result = [string.__add__(x) for x in customer.dict]
         except Error as e:
            result = "Conection failed! " + e
 
