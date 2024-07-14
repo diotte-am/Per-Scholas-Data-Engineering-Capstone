@@ -1,4 +1,3 @@
-import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType
 from models.extract import extract
@@ -25,4 +24,7 @@ def run_etl():
     # Display
     view = report()
     view.display_report()
+
+    # Clean up
+    data.delete_data()
     spark.stop()

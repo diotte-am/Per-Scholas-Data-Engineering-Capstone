@@ -26,6 +26,9 @@ class extract():
     def get_data(self) -> dict:
         return self.data
     
+    def delete_data(self) -> None:
+        self.data.clear()
+    
         
 
         
