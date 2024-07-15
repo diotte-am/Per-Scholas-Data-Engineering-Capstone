@@ -8,17 +8,18 @@ from schemas.customer_schema import customer_dict
 from schemas.month_schema import MONTHS
 from schemas.graph_schema import GRAPH
 from models.Customer import Customer
+from models.graph import graph
 
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 class app(customtkinter.CTk):
-    def __init__(self, model):
+    def __init__(self):
         super().__init__()
         self.util = GUI_util()
         year_list = self.util.get_years()
-        self.model = model
+        self.graph = graph()
         # configure window
         self.title("creditcard_capstone Query")
         self.geometry(f"{1100}x{550}")
@@ -368,6 +369,7 @@ class app(customtkinter.CTk):
         if var_name != "Choose Viz":
             current_description = GRAPH[var_name][1]
             self.Label_viz.configure(self.Label_viz.configure(text = current_description))
+            self.graph.test()
 
             
 
