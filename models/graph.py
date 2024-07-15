@@ -5,6 +5,7 @@ import my_secrets
 import pandas as pd
 from schemas.graph_schema import GRAPH
 
+
 class graph():
     def __init__(self) -> None:
         # connect to database
@@ -12,10 +13,10 @@ class graph():
         
         
 
-    def test(self):
-
+    def query(self, query):
         conn = self.engine.connect()
         if conn.connection:
-            df = pd.read_sql(GRAPH["3.1"][0], self.engine)
+            df = pd.read_sql(query, self.engine)
             
         return df
+    

@@ -8,7 +8,7 @@ from schemas.customer_schema import customer_dict
 from schemas.month_schema import MONTHS
 from schemas.graph_schema import GRAPH
 from models.Customer import Customer
-from models.graph import graph
+from views.report import report
 
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
@@ -19,7 +19,7 @@ class app(customtkinter.CTk):
         super().__init__()
         self.util = GUI_util()
         year_list = self.util.get_years()
-        self.graph = graph()
+        self.report = report(self)
         # configure window
         self.title("creditcard_capstone Query")
         self.geometry(f"{1100}x{550}")
@@ -43,7 +43,7 @@ class app(customtkinter.CTk):
  
         self.OptionMenu_viz = customtkinter.CTkOptionMenu(self.Frame_sidebar_visualizations, width=145, command=self.viz_change, values=list(GRAPH.keys()))
         self.OptionMenu_viz.set("Choose Viz")
-        self.Button_viz = customtkinter.CTkButton(self.Frame_sidebar_visualizations, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.choose_viz)
+        self.Button_viz = customtkinter.CTkButton(self.Frame_sidebar_visualizations, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Graph It", width=60, command=self.choose_viz)
     
   
         self.Label_viz.grid(row=4, column=0, rowspan=2, padx=30, pady=20)
@@ -51,10 +51,11 @@ class app(customtkinter.CTk):
         self.Button_viz.grid(row=7, column=0, padx=30, pady=20)
 
         # create textbox for output
-        self.Textbox_output = customtkinter.CTkTextbox(self, width=850)
+        self.Textbox_output = customtkinter.CTkLabel(self, width=850)
         self.Textbox_output.grid(row=0, column=1, rowspan=12, sticky="ns", pady=40)
-        self.Textbox_output.insert("0.0", "Enter search parameters")
-        self.Textbox_output.configure(state="disabled")
+        
+        self.Textbox_output.configure(state="disabled", text="Enter search parameters")
+
 
         '''
         Transactions
@@ -171,15 +172,11 @@ class app(customtkinter.CTk):
         self.Button_submit_bill.grid(row=4, column=0, padx=25, pady=20)
 
     def query_timespan(self):
-        self.Textbox_output.configure(state="normal")
         start_date = str(self.DateEntry_1.get_date()).replace("-", "")
         end_date = str(self.DateEntry_2.get_date()).replace("-", "")
         results = self.selected_customer.full_name() + "\n" + "Transactions between " + self.DateEntry_1.get_date().strftime("%m/%d/%Y") + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y") + "\n\n"
         results += self.util.query_timespan(start_date, end_date, self.selected_customer.dict)
-        self.Textbox_output.configure(text_color="white")
-        self.Textbox_output.delete(0.0, 'end')
-        self.Textbox_output.insert(text=results, index=0.0)
-        self.Textbox_output.configure(state="disabled")
+        self.Textbox_output.configure(text_color="white", text=results)
 
         
     def generate_bill(self):
@@ -198,21 +195,14 @@ class app(customtkinter.CTk):
             message = "INVALID QUERY:\n"
             for error in missing:
                 message += error + "\n"
-                self.Textbox_output.delete(0.0, 'end')
-                self.Textbox_output.insert(text=message, index=0.0)
-                self.Textbox_output.configure(text_color="red")
+                self.Textbox_output.configure(text_color="red", text=message)
         else:
-            self.Textbox_output.configure(text_color="white")
-            self.Textbox_output.delete(0.0, 'end')
             results = self.util.get_bills(month, year, self.selected_customer)
             text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n\n"
-            self.Textbox_output.insert(text=results, index=0.0)
-            self.Textbox_output.insert(text=text, index=0.0)
+            self.Textbox_output.configure(text_color="white", text = results + text)
 
-        self.Textbox_output.configure(state="disabled")
 
     def submit_parameters(self):
-        self.Textbox_output.configure(state="normal")
         year = self.OptionMenu_year.get()
         missing = []
         if year == "Choose Year":
@@ -232,12 +222,9 @@ class app(customtkinter.CTk):
             message = "INVALID QUERY:\n"
             for error in missing:
                 message += error + "\n"
-            self.Textbox_output.delete(0.0, 'end')
-            self.Textbox_output.insert(text=message, index=0.0)
-            self.Textbox_output.configure(text_color="red")
+            self.Textbox_output.configure(text_color="red", text=message)
         else:
             self.Textbox_output.configure(text_color="white")
-            self.Textbox_output.delete(0.0, 'end')
             results = self.util.get_bill(zip, year, month)
             results = self.util.extract_fields(results.values)
             if len(results) < 1:
@@ -247,8 +234,8 @@ class app(customtkinter.CTk):
                 for row in results:
 
                     string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
-            self.Textbox_output.insert(text=string.expandtabs(18), index=0.0)
-        self.Textbox_output.configure(state="disabled")
+            self.Textbox_output.configure(text=string.expandtabs(18))
+    
 
     def lookup_id(self):
         customer_id = self.Entry_find_customer.get()
@@ -256,10 +243,7 @@ class app(customtkinter.CTk):
         if customer_id in all_ids:
             self.open_popup(customer_id)
         else:
-            self.Textbox_output.configure(state="normal", text_color="red")
-            self.Textbox_output.delete("0.0", customtkinter.END)
-            self.Textbox_output.insert(index=customtkinter.END, text="ID not found!")
-            self.Textbox_output.configure(state="disabled")
+            self.Textbox_output.configure(text="ID not found!", text_color="red")
             self.open_popup_search()
 
     def open_popup(self, customer_id):
@@ -323,7 +307,10 @@ class app(customtkinter.CTk):
         self.util.edit_query(self.selected_customer)
 
     def choose_viz(self):
-        choice = self.OptionMenu_viz.get()
+        var_name = self.OptionMenu_viz.get()
+        if var_name != "Choose Viz":
+            results = self.report.plot_graph(var_name)
+            self.Textbox_output.configure(text=results)
         
         
         
@@ -368,13 +355,10 @@ class app(customtkinter.CTk):
     def viz_change(self, var_name):
         if var_name != "Choose Viz":
             current_description = GRAPH[var_name][1]
-            self.Label_viz.configure(self.Label_viz.configure(text = current_description))
-            df = self.graph.test()
-            print(df.to_string())
-            self.Textbox_output.configure(state="normal")
-            self.Textbox_output.delete(0.0, 'end')
-            self.Textbox_output.insert(text=df, index=0.0)
-            self.Textbox_output.configure(state="disabled")
+            self.Label_viz.configure(text = current_description)
+
+            self.Textbox_output.configure(text=GRAPH[var_name][1])
+            
 
             
 
