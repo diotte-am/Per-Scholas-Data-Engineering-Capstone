@@ -17,4 +17,5 @@ class graph():
         conn = self.engine.connect()
         if conn.connection:
             df = pd.read_sql(GRAPH["3.1"][0], self.engine)
-            print(df)
+            
+        return df

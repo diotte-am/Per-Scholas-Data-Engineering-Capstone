@@ -369,7 +369,12 @@ class app(customtkinter.CTk):
         if var_name != "Choose Viz":
             current_description = GRAPH[var_name][1]
             self.Label_viz.configure(self.Label_viz.configure(text = current_description))
-            self.graph.test()
+            df = self.graph.test()
+            print(df.to_string())
+            self.Textbox_output.configure(state="normal")
+            self.Textbox_output.delete(0.0, 'end')
+            self.Textbox_output.insert(text=df, index=0.0)
+            self.Textbox_output.configure(state="disabled")
 
             
 
