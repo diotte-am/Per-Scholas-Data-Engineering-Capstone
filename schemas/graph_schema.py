@@ -22,18 +22,19 @@ GRAPH = {
             COUNT(A_ID) AS Total\
             FROM CDW_SAPP_LOAN_DATA WHERE Married = 0 AND Gender = 'Male' GROUP BY Application_Status",
             "Percentage of rejection for married male applicants"],
-    "5.2" : ["SELECT COUNT(A_ID) AS Total, Application_Status, Self_Employed FROM CDW_SAPP_LOAN_DATA GROUP BY Application_Status, Self_Employed", 
+    "5.2" : ["SELECT COUNT(A_ID) AS Total,\
+              IF(Application_Status = 1, 'Approved', 'Denied') AS Application_Status FROM CDW_SAPP_LOAN_DATA WHERE Self_Employed = 1 GROUP BY Application_Status", 
              "Percentage of applications approved for self-employed applicants"],
-    "5.3" : ["SELECT SUBSTRING(CAST(TIMEID AS CHAR), 1, 6) AS YEAR,\
+    "5.3" : ["SELECT SUBSTRING(CAST(TIMEID AS CHAR), 1, 6) AS MONTH,\
             COUNT(TRANSACTION_ID) AS TOTAL FROM CDW_SAPP_CREDIT\
-            GROUP BY YEAR\
+            GROUP BY MONTH\
             ORDER BY TOTAL DESC\
             LIMIT 3",
-            "plot the top three months with the largest volume of transaction data"],
+            "Plot the Top 3 Months with the Largest Volume of Transaction Data"],
     "5.4" : ["SELECT SUM(c.TRANSACTION_VALUE) AS TOTAL,\
             c.BRANCH_CODE, b.BRANCH_CITY FROM CDW_SAPP_CREDIT AS c\
             JOIN CDW_SAPP_BRANCH AS b ON b.BRANCH_CODE = c.BRANCH_CODE\
             WHERE TRANSACTION_TYPE = 'Healthcare'\
             GROUP BY BRANCH_CODE ORDER BY TOTAL DESC LIMIT 5",
-            "Branches with the highest total healthcare transaction cost"]
+            "Branches with the Highest Total Healthcare Transaction Cost"]
 }
