@@ -2,41 +2,23 @@ import tkinter
 import tkinter.messagebox
 import customtkinter
 from util.gui_util import GUI_util
-from Customer import Customer
-from TBL_NAME import TBL_NAME
 from tkcalendar import Calendar, DateEntry
 import datetime
+from schemas.customer_schema import customer_dict
+from schemas.month_schema import MONTHS
+from schemas.graph_schema import GRAPH
+from models.Customer import Customer
+
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-
-
-MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-customer_dict = {
-    "SSN": "Social Security Number", 
-    "FIRST_NAME": "First Name", 
-    "MIDDLE_NAME": "Middle Name", 
-    "LAST_NAME": "Last Name", 
-    "CREDIT_CARD_NO": "Credit Card Number",
-    "FULL_STREET_ADDRESS": "Street Address", 
-    "CUST_CITY": "City", 
-    "CUST_STATE": "State", 
-    "CUST_COUNTRY": "Country", 
-    "CUST_ZIP": "Zip Code", 
-    "CUST_PHONE": "Phone Number",
-    "CUST_EMAIL": "Email Address",
-    "LAST_UPDATED": "Last Updated",
-    "CUST_ID": "Customer ID"
-    }
-
 class app(customtkinter.CTk):
-    def __init__(self):
+    def __init__(self, model):
         super().__init__()
         self.util = GUI_util()
         year_list = self.util.get_years()
-
+        self.model = model
         # configure window
         self.title("creditcard_capstone Query")
         self.geometry(f"{1100}x{550}")
@@ -52,7 +34,21 @@ class app(customtkinter.CTk):
         self.Tabview.add("Customers")
         self.Tabview.add("Transactions")
         self.Tabview.add("Viz")
-        
+        self.Frame_sidebar_visualizations = customtkinter.CTkFrame(self.Tabview.tab("Viz"), width=150, corner_radius=0)
+        self.Frame_sidebar_visualizations.grid(row=0, column=0, rowspan=10, sticky="nsew")
+        self.Frame_sidebar_visualizations.grid_rowconfigure(10, weight=1)
+
+        self.Label_viz = customtkinter.CTkLabel(self.Frame_sidebar_visualizations, text="No Query\nSelected", anchor="w", wraplength=150)
+ 
+        self.OptionMenu_viz = customtkinter.CTkOptionMenu(self.Frame_sidebar_visualizations, width=145, command=self.viz_change, values=list(GRAPH.keys()))
+        self.OptionMenu_viz.set("Choose Viz")
+        self.Button_viz = customtkinter.CTkButton(self.Frame_sidebar_visualizations, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.choose_viz)
+    
+  
+        self.Label_viz.grid(row=4, column=0, rowspan=2, padx=30, pady=20)
+        self.OptionMenu_viz.grid(row=6, column=0, padx=30, ipady=0)
+        self.Button_viz.grid(row=7, column=0, padx=30, pady=20)
+
         # create textbox for output
         self.Textbox_output = customtkinter.CTkTextbox(self, width=850)
         self.Textbox_output.grid(row=0, column=1, rowspan=12, sticky="ns", pady=40)
@@ -62,7 +58,6 @@ class app(customtkinter.CTk):
         '''
         Transactions
         ''' 
-
         # transaction sidebar
         self.Frame_sidebar_transactions = customtkinter.CTkFrame(self.Tabview.tab("Transactions"), width=150, corner_radius=0)
         self.Frame_sidebar_transactions.grid(row=0, column=0, rowspan=10, sticky="nsew")
@@ -265,11 +260,6 @@ class app(customtkinter.CTk):
             self.Textbox_output.insert(index=customtkinter.END, text="ID not found!")
             self.Textbox_output.configure(state="disabled")
             self.open_popup_search()
- 
-
-
-    def hide_customers(self):
-        pass
 
     def open_popup(self, customer_id):
         top= customtkinter.CTkToplevel(self)
@@ -330,6 +320,10 @@ class app(customtkinter.CTk):
     def submit_edit(self):
         self.current_top.destroy()
         self.util.edit_query(self.selected_customer)
+
+    def choose_viz(self):
+        choice = self.OptionMenu_viz.get()
+        
         
         
     def edit_customer(self):
@@ -369,6 +363,12 @@ class app(customtkinter.CTk):
 
         submit_button = customtkinter.CTkButton(self.Frame_edit, text="Submit", command=self.submit_edit)
         submit_button.grid(row=6, columnspan=2, column=1, pady=20)
+
+    def viz_change(self, var_name):
+        if var_name != "Choose Viz":
+            current_description = GRAPH[var_name][1]
+            self.Label_viz.configure(self.Label_viz.configure(text = current_description))
+
             
 
         

@@ -1,49 +1,11 @@
 import mysql.connector as dbconnect
 from mysql.connector import Error
 import my_secrets
-from TBL_NAME import TBL_NAME
 import pandas as pd
 
 class GUI_util():
     def __init__(self):
-        self.current_table = TBL_NAME.CREDIT
-    
-    def build_query(self):
-        if self.current_table == TBL_NAME.CREDIT:
-            valid_input = False
-            
-            while not valid_input:
-                input_zip = input("Enter a five digit zip code: ")
-                if len(input_zip) == 5:
-                    if input_zip.isnumeric():
-                        valid_input = True
-                print("Zip code must be a five digit number!")
-
-            valid_input = False
-            while not valid_input:
-                input_month = input("Enter month as a number(1-12):")
-                if input_month.isnumeric():
-                    month = int(input_month)
-                    if month >= 1 and month <= 12:
-                        if month >= 1 and month <= 9:
-                            input_month = "0" + input_month
-                        valid_input = True
-                    else: print("Invalid input, must be between 1 and 12!")
-                else:
-                    print("Invalid input, must be a number!")
-            
-            valid_input = False
-            while not valid_input:
-                input_year = input("Enter year:")
-                if input_year.isnumeric():
-                    year = int(input_year)
-                    if year >= 1970 and year <= 2024:
-                        valid_input = True
-                    else: print("Invalid input, must be between 1 and 12!")
-                else:
-                    print("Invalid input, must be a number!")
-            
-        return input_zip, input_month, input_year
+        pass
     
     def get_bill(self, zip, year, month):
         query = "SELECT *, SUBSTRING(CREDIT.TIMEID, 7) AS DAY\
@@ -62,32 +24,7 @@ class GUI_util():
                         
         except Error as e:
             print(query)
-            print("Connection failed! 65", e)
-
-
-    
-    def all_details(self, inputs):
-        if self.current_table == TBL_NAME.CUST:
-            query = "SELECT * FROM CDW_SAPP_CUSTOMER"
-        elif self.current_table == TBL_NAME.CREDIT:
-            query = "SELECT *, SUBSTRING(CREDIT.TIMEID, 7) AS DAY\
-                FROM CDW_SAPP_CREDIT AS CREDIT\
-                JOIN CDW_SAPP_BRANCH AS BRANCH ON CREDIT.BRANCH_CODE = BRANCH.BRANCH_CODE\
-                WHERE SUBSTRING(CREDIT.TIMEID, 1, 6) = " + inputs[2] + inputs[1] + " AND \
-                BRANCH.BRANCH_ZIP = " + inputs[0] + " ORDER BY DAY DESC"
-        conn = None
-        try: 
-            conn = dbconnect.connect(host='localhost', user=my_secrets.username, database='creditcard_capstone', password=my_secrets.password)
-
-            if conn.is_connected():
-                df = pd.read_sql(query, conn)
-                conn.close()
-                return df
-                        
-        except Error as e:
-            print(query)
-            print("Connection failed! 88", e)
-
+            print("Query failed at line 65", e)
 
     def extract_fields(self, results: list[str]):
         final = pd.DataFrame(columns=["credit card number", "transaction time", "branch code", "transaction type", "transaction value", "transaction id"])
@@ -111,10 +48,6 @@ class GUI_util():
 
         return final.values
         
-    def set_table(self, table_name: TBL_NAME):
-        self.current_table = table_name
-
-        
     def get_years(self):
         conn = None
         query = "SELECT DISTINCT SUBSTRING(CAST(TIMEID AS CHAR), 1, 4) AS YEAR FROM CDW_SAPP_CREDIT"
@@ -126,7 +59,7 @@ class GUI_util():
                                     
         except Error as e:
             print(query)
-            print("Connection failed! 142", e)
+            print("Query failed at line 142", e)
         return year_df["YEAR"]
         
     def get_all_CUST_IDs(self):
@@ -139,8 +72,7 @@ class GUI_util():
                 conn.close()
                                   
         except Error as e:
-            print(query)
-            print("Connection failed! 157", e)
+            print("Query failed at line 157", e)
         return id_list.values
     
     def get_customer(self, cust_id):
@@ -154,7 +86,7 @@ class GUI_util():
                                   
         except Error as e:
             print(query)
-            print("Connection failed! 171", e)
+            print("Query failed at line 171", e)
 
         return cust_list.values[0]
     
@@ -178,7 +110,7 @@ class GUI_util():
                                   
         except Error as e:
             print(query)
-            print("Connection failed! 195", e)
+            print("Query failed at line 195", e)
         string += "\n" + "Total bill: $" +  str(round(sum, 2))
         return string
 
