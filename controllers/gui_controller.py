@@ -2,11 +2,11 @@ import mysql.connector as dbconnect
 from mysql.connector import Error
 import my_secrets
 import pandas as pd
-from views import view
+from views.app import app
 
 def run_gui():
-    app = view()
-    app.mainloop()
+    view = app()
+    view.mainloop()
 
     # handles request from gui
     # communicates with db

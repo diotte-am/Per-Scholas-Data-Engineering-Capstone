@@ -1,7 +1,7 @@
 import tkinter
 import tkinter.messagebox
 import customtkinter
-import GUI_util as util
+from util.gui_util import GUI_util
 from Customer import Customer
 from TBL_NAME import TBL_NAME
 from tkcalendar import Calendar, DateEntry
@@ -9,6 +9,7 @@ import datetime
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
+
 
 
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -30,12 +31,11 @@ customer_dict = {
     "CUST_ID": "Customer ID"
     }
 
-        
-class view(customtkinter.CTk):
+class app(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-
-
+        self.util = GUI_util()
+        year_list = self.util.get_years()
 
         # configure window
         self.title("creditcard_capstone Query")
@@ -70,7 +70,7 @@ class view(customtkinter.CTk):
 
         # year dropdown
         self.Label_year = customtkinter.CTkLabel(self.Frame_sidebar_transactions, text="Year:", anchor="w")
-        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar_transactions)
+        self.OptionMenu_year = customtkinter.CTkOptionMenu(self.Frame_sidebar_transactions, values=year_list)
         self.OptionMenu_year.set("Choose Year")
 
         # month dropdown
@@ -242,12 +242,8 @@ class view(customtkinter.CTk):
         else:
             self.Textbox_output.configure(text_color="white")
             self.Textbox_output.delete(0.0, 'end')
-            
-            util.GUI_util.set_table(util.GUI_util, TBL_NAME.CREDIT)
-            results = util.GUI_util.all_details(util.GUI_util,
-                                      [zip, month, year])
-            print(results)
-            results = util.GUI_util.extract_fields(util.GUI_util, results.values)
+            results = self.util.get_bill(zip, year, month)
+            results = self.util.extract_fields(results.values)
             if len(results) < 1:
                 string = "No results found."
             else:
@@ -327,15 +323,13 @@ class view(customtkinter.CTk):
         customtkinter.CTkLabel(top, text= customer_id).place(x=150,y=80)
 
     def on_change(self, var_name, index, mode):
-        widget = self.widgets[var_name]
-        self.selected_customer.dict[var_name] = widget.get()
+        if var_name in self.widgets:
+            widget = self.widgets[var_name]
+            self.selected_customer.dict[var_name] = widget.get()
         
-
-
-
     def submit_edit(self):
         self.current_top.destroy()
-        #self.util.edit_query(self.selected_customer)
+        self.util.edit_query(self.selected_customer)
         
         
     def edit_customer(self):
@@ -369,11 +363,12 @@ class view(customtkinter.CTk):
                     self.widgets[k].configure(state="disabled")
                 if k == "CUST_ID":
                     self.widgets[k].configure(state="disabled")
-                    
-                
                 row += 2
                 column += 1
                 
 
         submit_button = customtkinter.CTkButton(self.Frame_edit, text="Submit", command=self.submit_edit)
         submit_button.grid(row=6, columnspan=2, column=1, pady=20)
+            
+
+        

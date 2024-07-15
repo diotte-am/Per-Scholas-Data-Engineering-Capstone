@@ -38,12 +38,6 @@ transform_schema = {
         TRANSACTION_VALUE,\
         TRANSACTION_ID FROM CDW_SAPP_CREDIT",
     # table 4
-    "CDW_SAPP_PERIOD" : "SELECT DISTINCT Day,\
-        Month,\
-        Year,\
-        10000 * Year + 100 * Month + Day AS TIMEID\
-        FROM CDW_SAPP_CREDIT",
-    # table 5
     "CDW_SAPP_LOAN_DATA" : "SELECT Application_ID,\
         CAST(SUBSTRING(Application_ID, 3, 6) AS int) AS A_ID,\
         IF(Application_Status = 'Y', 1, 0) AS APPLICATION_STATUS,\
