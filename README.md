@@ -1,19 +1,17 @@
-
-
-
-
-![Schema for creditcard_capstone db](images/data_lake.png)
-
-
-
 ### Workflow Steps
-- Read JSON Files with PySpark: Use PySpark to read and process the JSON files. PySpark is well-suited for handling large datasets and distributed data processing.
+- Plan architecture of program
+
+- Research library for front end Dashboard
+
+- Read JSON Files with PySpark, get and process API request
 
 - Transform Data with PySpark: Perform necessary transformations using PySpark.
 
 - Convert Data to Pandas DataFrame: Convert the transformed PySpark DataFrame to a Pandas DataFrame for any further processing that is more convenient or efficient in Pandas.
 
-- Load Data into MySQL with SQLAlchemy: Use SQLAlchemy to load the processed data into a MySQL database.
+- Load Data into MySQL with SQLAlchemy
+
+![Schema for creditcard_capstone db](images/data_lake.png)
 
 ### Cleaning and transforming data
 I created a ETL pipeline to clean and organize the data from the JSON files and API into a one database. I was given a mapping document with instructions on how to organize this text into tables. 

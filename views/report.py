@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from schemas.graph_schema import GRAPH
 import customtkinter  
 from schemas.month_schema import MONTHS
+import typing
 
 class report():
     def __init__(self, parent):
@@ -16,15 +17,17 @@ class report():
         self.graph = graph()
         self.colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2']
      
-    def plot_graph(self, query_num):
-        top= customtkinter.CTkToplevel(self.parent)
+    def plot_graph(self, query_num: str) -> str:
+        top : customtkinter.CTkToplevel = customtkinter.CTkToplevel(self.parent)
         top.geometry("800x600")
         top.title(GRAPH[query_num][1])
-        frame = customtkinter.CTkFrame(top)
-        frame.grid(row=0, column=0, sticky="nsew")
-
         top.grid_rowconfigure(0, weight=1)
         top.grid_columnconfigure(0, weight=1)
+
+        frame : customtkinter.CTkFrame = customtkinter.CTkFrame(top)
+        frame.grid(row=0, column=0, sticky="nsew")
+
+        
 
         results = self.graph.query(GRAPH[query_num][0])
         fig = Figure(figsize=(8, 6), dpi=100)
