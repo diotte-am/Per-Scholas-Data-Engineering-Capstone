@@ -35,7 +35,7 @@ class report():
                 ax.set_title(GRAPH[query_num][1])
                 ax.set_xlabel("Transaction Type")
                 ax.set_ylabel("Total Transactions")
-                ax.set_xticklabels(results['TRANSACTION_TYPE'], rotation=45, ha='right')
+                ax.set_xticklabels(results['TRANSACTION_TYPE'], rotation=45, ha='center')
             case "3.2":
                 ax.bar(results["CUST_STATE"], results["TOTAL"], color=self.colors)
                 ax.set_title(GRAPH[query_num][1])
@@ -46,20 +46,27 @@ class report():
                 ax.set_title(GRAPH[query_num][1])
                 ax.set_xlabel("Customer Name")
                 ax.set_ylabel("Total Transaction Cost")
-                ax.set_xticklabels(results['NAME'], rotation=45, ha='right')
+                ax.set_xticklabels(results['NAME'], rotation=45, ha='center')
             case "5.1":
-                wedges, texts, autotexts = ax.pie(results["Percent"], labels=results['Result'], autopct='%1.1f%%', startangle=90, colors=['#1f77b4', '#ff7f0e'])
+                wedges, texts, autotexts = ax.pie(results["Percent"], labels=results['Result'], autopct='%1.1f%%', startangle=90, colors=['green', 'red'])
                 ax.axis("equal")
                 ax.set_title(GRAPH[query_num][1])
-                for text in texts + autotexts:
+                for text in texts:
                     text.set_fontsize(12)
+                for autotext in autotexts:
+                    autotext.set_color("white")
+                    autotext.set_fontsize(16)
             case "5.2":
                 ax.pie(results["Total"])
-                wedges, texts, autotexts = ax.pie(results["Total"], labels=results['Application_Status'], autopct='%1.1f%%', startangle=90, colors=['#1f77b4', '#ff7f0e'])
+                wedges, texts, autotexts = ax.pie(results["Total"], labels=results['Application_Status'], autopct='%1.1f%%', startangle=90, colors=['green', 'red'])
                 ax.axis("equal")
                 ax.set_title(GRAPH[query_num][1])
-                for text in texts + autotexts:
+                for text in texts:
                     text.set_fontsize(12)
+                for autotext in autotexts:
+                    autotext.set_color("white")
+                    autotext.set_fontsize(16)
+                    
             case "5.3":
                 bars = ax.barh(results["MONTH"], results["TOTAL"], color=self.colors)
                 ax.set_xlabel('Transaction Volume')

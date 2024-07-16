@@ -21,7 +21,7 @@ class app(customtkinter.CTk):
         year_list = self.util.get_years()
         self.report = report(self)
         # configure window
-        self.title("creditcard_capstone Query")
+        self.title("creditcard_capstone Dashboard")
         self.geometry(f"{1100}x{550}")
 
         # configure grid layout (4x4)
@@ -105,8 +105,7 @@ class app(customtkinter.CTk):
 
         self.Label_find_customer = customtkinter.CTkLabel(
             self.Frame_sidebar_customers, 
-            text="No customer selected\n")
-        
+            text="No customer selected\n", wraplength=150)
 
         self.Button_find_customer = customtkinter.CTkButton(self.Frame_sidebar_customers, text="Lookup Customer", command=self.lookup_id)
         self.Entry_find_customer = customtkinter.CTkEntry(self.Frame_sidebar_customers, placeholder_text="Customer ID")
@@ -303,11 +302,10 @@ class app(customtkinter.CTk):
 
     def open_popup_search(self):
         top= customtkinter.CTkToplevel(self)
-        top.geometry("600x250")
+        top.geometry("400x200")
         top.title("Search for customer ID")
         customer_id = "Customer ID not found!\nContact administrator for assistance"
-        customtkinter.CTkLabel(top, text= customer_id).place(x=150,y=80)
-
+        customtkinter.CTkLabel(top, text= customer_id, anchor=customtkinter.CENTER).pack(pady=40)
     def on_change(self, var_name, index, mode):
         if var_name in self.widgets:
             widget = self.widgets[var_name]

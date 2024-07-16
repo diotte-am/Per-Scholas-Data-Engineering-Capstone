@@ -3,12 +3,12 @@ GRAPH = {
             TRANSACTION_TYPE FROM CDW_SAPP_CREDIT\
             GROUP BY TRANSACTION_TYPE\
             ORDER BY TOTAL DESC",
-            "Transaction type with the highest transaction count"],
+            "Transaction Type with the Highest Transaction Count"],
     "3.2" : ["SELECT CUST_STATE,\
             COUNT(CUST_ID) AS TOTAL FROM CDW_SAPP_CUSTOMER\
             GROUP BY CUST_STATE\
             ORDER BY TOTAL DESC LIMIT 10",
-            "Top 10 states with the highest number of customers"],
+            "Top 10 States with the Highest Number of Customers"],
     "3.3" : ["SELECT CDW_SAPP_CUSTOMER.CUST_ID,\
             CONCAT(CDW_SAPP_CUSTOMER.FIRST_NAME, ' ', CDW_SAPP_CUSTOMER.LAST_NAME) AS NAME,\
             COUNT(CDW_SAPP_CREDIT.TRANSACTION_ID) AS TOTAL,\
@@ -16,15 +16,15 @@ GRAPH = {
             FROM CDW_SAPP_CUSTOMER JOIN CDW_SAPP_CREDIT ON CDW_SAPP_CUSTOMER.CUST_ID = CDW_SAPP_CREDIT.CUST_ID\
             GROUP BY CDW_SAPP_CUSTOMER.CUST_ID\
             ORDER BY SUM DESC LIMIT 10",
-            "Top 10 customers with the highest transaction amounts"],
+            "Top 10 Customers with the Highest Transaction Amounts"],
     "5.1" : ["SELECT COUNT(A_ID)/(SELECT COUNT(A_ID) FROM CDW_SAPP_LOAN_DATA WHERE Married = 0 AND Gender = 'Male')*100 AS Percent,\
-            (CASE Application_Status WHEN 1 THEN 'Approved' ELSE 'Declined' END) as Result,\
+            (CASE Application_Status WHEN 1 THEN 'Approved' ELSE 'Denied' END) as Result,\
             COUNT(A_ID) AS Total\
             FROM CDW_SAPP_LOAN_DATA WHERE Married = 0 AND Gender = 'Male' GROUP BY Application_Status",
-            "Percentage of rejection for married male applicants"],
+            "Percentage of Rejection for Married Male Applicants"],
     "5.2" : ["SELECT COUNT(A_ID) AS Total,\
               IF(Application_Status = 1, 'Approved', 'Denied') AS Application_Status FROM CDW_SAPP_LOAN_DATA WHERE Self_Employed = 1 GROUP BY Application_Status", 
-             "Percentage of applications approved for self-employed applicants"],
+             "Percentage of Applications Approved for Self-Employed Applicants"],
     "5.3" : ["SELECT SUBSTRING(CAST(TIMEID AS CHAR), 1, 6) AS MONTH,\
             COUNT(TRANSACTION_ID) AS TOTAL FROM CDW_SAPP_CREDIT\
             GROUP BY MONTH\
