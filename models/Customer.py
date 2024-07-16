@@ -35,8 +35,6 @@ class Customer():
         self.dict["LAST_UPDATED"] = customer[12]
         self.dict["CUST_ID"] = customer[13]
 
-
-
     def customer_summary(self):
         message = "Is this the correct customer?\n"
         message += self.dict["FIRST_NAME"] + " " + self.dict["MIDDLE_NAME"] + " " + self.dict["LAST_NAME"] + "\n"
@@ -65,4 +63,3 @@ class Customer():
     def print_fields(self):
         for item in dict.keys():
             print(item)
-

@@ -1,7 +1,0 @@
-from enum import Enum
-
-class TBL_NAME(Enum):
-    CREDIT = "CDW_SAPP_CREDIT"
-    BRANCH = "CDW_SAPP_BRANCH"
-    CUST = "CDW_SAPP_CUSTOMER"
-    PERIOD = "CDW_SAPP_PERIOD"
