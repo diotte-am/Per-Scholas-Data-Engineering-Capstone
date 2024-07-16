@@ -137,3 +137,8 @@ The branches with the highest total dollar value of healthcare transactions are:
 3. Brookfield
 4. El Dorado
 5. Kernersville
+
+## For the future:
+- I still want to refactor the App class and split that up into components to better mirror the MVC structure of the pipeline. Right now that file is still messy and unwieldy.
+
+- Refactor MySQL connections - I started with the mysql connector package but discovered it didn't support alter and update table and I was getting warnings that it might not work with pandas. I switched to SQLAlchemy when I implemented the API call, but I didn't have time to go back and change the ETL connections to SQLAlchemy.
