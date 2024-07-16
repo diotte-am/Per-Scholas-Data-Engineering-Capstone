@@ -16,6 +16,14 @@
 
 - Load Data into MySQL with SQLAlchemy
 
+- Research GUI options for python
+
+- Implement Dashboard
+
+- Create visualizations
+
+- Combine visualizations and GUI
+
 ### Architecture
 ![architecture of the program](images/architecture.png)
 
