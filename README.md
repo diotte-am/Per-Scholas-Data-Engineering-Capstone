@@ -1,3 +1,8 @@
+# ETL Pipeline and Data Visualization Dashboard
+## Amare Diotte
+### Per Scholas Data Engineering 
+### July 2027
+
 ### Workflow Steps
 - Plan architecture of program
 
@@ -12,8 +17,10 @@
 - Load Data into MySQL with SQLAlchemy
 
 ### Architecture
-![architecture of the program](images/data_lake.png)
+![architecture of the program](images/architecture.png)
 I could see how this was going to be a complicated program, I was communicating with a database, an api, and opening external documents. My program also had two distinct functions - ETL and displaying results - so I wanted to make sure I used separation of concerns when designing my program. I used the model view controller pattern to accomplish this. Only the model interacts with the data source and only the view interacts with the output. 
+
+Once I figured out the overall design of the program, I started out planning my database by making an ERD diagram:
 
 ![Schema for creditcard_capstone db](images/data_lake.png)
 
