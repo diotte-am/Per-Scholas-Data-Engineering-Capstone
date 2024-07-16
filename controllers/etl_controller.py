@@ -21,9 +21,6 @@ def run_etl():
     loaded_data = load(transformed_data)
     loaded_data.load()
     
-    # Display
-    view = report()
-    view.display_report()
 
     # Clean up
     data.delete_data()

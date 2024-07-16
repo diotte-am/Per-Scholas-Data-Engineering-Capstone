@@ -51,10 +51,11 @@ class app(customtkinter.CTk):
         self.Button_viz.grid(row=7, column=0, padx=30, pady=20)
 
         # create textbox for output
-        self.Textbox_output = customtkinter.CTkLabel(self, width=850)
+        self.Textbox_output = customtkinter.CTkTextbox(self, width=850)
         self.Textbox_output.grid(row=0, column=1, rowspan=12, sticky="ns", pady=40)
+        self.Textbox_output.insert("0.0", "Enter search parameters")
+        self.Textbox_output.configure(state="disabled")
         
-        self.Textbox_output.configure(state="disabled", text="Enter search parameters")
 
 
         '''
@@ -80,7 +81,7 @@ class app(customtkinter.CTk):
         self.Entry_zip = customtkinter.CTkEntry(self.Frame_sidebar_transactions, placeholder_text="Enter Zip")
 
         # submit button
-        self.Button_submit = customtkinter.CTkButton(master=self.Frame_sidebar_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.submit_parameters)
+        self.Button_submit = customtkinter.CTkButton(master=self.Frame_sidebar_transactions, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="Submit Query", width=60, command=self.submit_date_zip)
         self.Button_submit.grid(row=10, column=0, padx=30)
 
         # set to view
@@ -170,17 +171,31 @@ class app(customtkinter.CTk):
         self.Label_month_bill.grid(row=2, column=0, padx=25, pady=(10, 0), ipady=0)
         self.OptionMenu_month_bill.grid(row=3, column=0, padx=25, pady=(0, 10))
         self.Button_submit_bill.grid(row=4, column=0, padx=25, pady=20)
+    
+    def update_textbox(self, text, error):
+        self.Textbox_output.configure(state="normal")
+        self.Textbox_output.delete(0.0, 'end')
+        self.Textbox_output.insert(text=text, index=0.0)
+        if error:
+            self.Textbox_output.configure(text_color="red")
+        else:
+            self.Textbox_output.configure(text_color="white")
+        self.Textbox_output.configure(state="disabled")
 
     def query_timespan(self):
         start_date = str(self.DateEntry_1.get_date()).replace("-", "")
         end_date = str(self.DateEntry_2.get_date()).replace("-", "")
-        results = self.selected_customer.full_name() + "\n" + "Transactions between " + self.DateEntry_1.get_date().strftime("%m/%d/%Y") + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y") + "\n\n"
+        
+        results = self.selected_customer.full_name() + "\n"\
+            + "Transactions between "\
+                + self.DateEntry_1.get_date().strftime("%m/%d/%Y")\
+                    + " and " + self.DateEntry_2.get_date().strftime("%m/%d/%Y")\
+                        + "\n\n"
+        
         results += self.util.query_timespan(start_date, end_date, self.selected_customer.dict)
-        self.Textbox_output.configure(text_color="white", text=results)
-
+        self.update_textbox(results, False)
         
     def generate_bill(self):
-        self.Textbox_output.configure(state="normal")
         month_name = self.OptionMenu_month_bill.get()
         year = self.OptionMenu_year_bill.get()
         missing = []
@@ -195,14 +210,13 @@ class app(customtkinter.CTk):
             message = "INVALID QUERY:\n"
             for error in missing:
                 message += error + "\n"
-                self.Textbox_output.configure(text_color="red", text=message)
+                self.update_textbox(message, True)
         else:
             results = self.util.get_bills(month, year, self.selected_customer)
             text = self.Label_find_customer.cget("text") + "\n" + month_name + " " + str(year) + "\n\n"
-            self.Textbox_output.configure(text_color="white", text = results + text)
+            self.update_textbox(text + results, False)
 
-
-    def submit_parameters(self):
+    def submit_date_zip(self):
         year = self.OptionMenu_year.get()
         missing = []
         if year == "Choose Year":
@@ -222,19 +236,16 @@ class app(customtkinter.CTk):
             message = "INVALID QUERY:\n"
             for error in missing:
                 message += error + "\n"
-            self.Textbox_output.configure(text_color="red", text=message)
+            self.update_textbox(message, True)
         else:
-            self.Textbox_output.configure(text_color="white")
-            results = self.util.get_bill(zip, year, month)
-            results = self.util.extract_fields(results.values)
-            if len(results) < 1:
-                string = "No results found."
-            else:
-                string = ""
-                for row in results:
+            results = self.util.get_date_zip(zip, year, month)
 
-                    string += "CC#: " + str(row[0]) + "\tDate: " + str(row[1]) + "\tBranch: " + str(row[2]) + "\tType: " + str(row[3]) + "\tTotal$: " + str(row[4]) + "\tBranch: " + str(row[5]) + "\n"
-            self.Textbox_output.configure(text=string.expandtabs(18))
+            if len(results) < 1:
+                results = "No results found."
+            else:
+                text = "Transactions in zip code " + zip + " during " + MONTHS[int(month)] + " of " + year + "\n\n"
+                self.update_textbox(text + results, False)
+                
     
 
     def lookup_id(self):
@@ -243,7 +254,7 @@ class app(customtkinter.CTk):
         if customer_id in all_ids:
             self.open_popup(customer_id)
         else:
-            self.Textbox_output.configure(text="ID not found!", text_color="red")
+            self.update_textbox("ID not found!", True)
             self.open_popup_search()
 
     def open_popup(self, customer_id):
@@ -310,9 +321,7 @@ class app(customtkinter.CTk):
         var_name = self.OptionMenu_viz.get()
         if var_name != "Choose Viz":
             results = self.report.plot_graph(var_name)
-            self.Textbox_output.configure(text=results)
-        
-        
+            self.update_textbox(results, False)
         
     def edit_customer(self):
         self.widgets = {}
