@@ -6,12 +6,12 @@ from schemas.pk_schema import pk_schema
 from schemas.fk_schema import fk_schema
 
 class load():
-    def __init__(self, data):
+    def __init__(self, data: dict):
         # connect to the database, save connection as object
         self.data = data
         self.create_db()
 
-    def create_db(self):
+    def create_db(self) -> None:
         # connect to MySQL database
         conn = None
         try: 
@@ -29,7 +29,7 @@ class load():
         except Error as e:
             print("Conection failed!", e)
 
-    def load(self):
+    def load(self) -> None:
         # connect to db
         self.create_db()
 
@@ -45,7 +45,7 @@ class load():
         self.load_PKs()
         self.load_FKs()
 
-    def load_PKs(self):
+    def load_PKs(self) -> None:
         ''' Connect to MySQL database'''
         conn = None
         try: 
@@ -61,7 +61,7 @@ class load():
         except Error as e:
             print("Conection failed!", e)
 
-    def load_FKs(self):
+    def load_FKs(self) -> None:
         ''' Connect to MySQL database'''
         conn = None
         try: 

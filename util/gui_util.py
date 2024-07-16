@@ -2,15 +2,16 @@ import mysql.connector as dbconnect
 from mysql.connector import Error
 import my_secrets
 import pandas as pd
+from models.Customer import Customer
 
-class GUI_util():
-    def __init__(self):
+class GUI_util:
+    def __init__(self) -> None:
         pass
     
-    def date_to_string(self, dateID):
+    def date_to_string(self, dateID: str) -> str:
         return dateID[0:4] + "/" + dateID[4:6] + "/" + dateID[6:]
 
-    def get_date_zip(self, zip, year, month):
+    def get_date_zip(self, zip: str, year: str, month: str) -> str:
         query = "SELECT *, SUBSTRING(CREDIT.TIMEID, 7) AS DAY\
                 FROM CDW_SAPP_CREDIT AS CREDIT\
                 JOIN CDW_SAPP_BRANCH AS BRANCH ON CREDIT.BRANCH_CODE = BRANCH.BRANCH_CODE\
@@ -59,7 +60,7 @@ class GUI_util():
             print("Query failed at line 157", e)
         return id_list.values
     
-    def get_customer(self, cust_id):
+    def get_customer(self, cust_id : str) -> str:
         conn = None
         query = "SELECT * FROM CDW_SAPP_CUSTOMER WHERE CUST_ID = " + cust_id
         try:
@@ -73,7 +74,7 @@ class GUI_util():
             print("Query failed at line 171", e)
         return cust_list.values[0]
     
-    def get_bills(self, month, year, selected_customer):
+    def get_bills(self, month: str, year: str, selected_customer: Customer):
         customer_id = selected_customer.get_id()
         conn = None
         query = "SELECT * FROM CDW_SAPP_CREDIT WHERE CUST_ID = " + str(customer_id) + " AND CAST(TIMEID AS CHAR) LIKE '" + year + month + "__'"

@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import customtkinter as ctk
 import tkinter as tk
-from models.graph import graph
+from models.graph_util import graph_util
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from schemas.graph_schema import GRAPH
@@ -14,7 +14,7 @@ import typing
 class report():
     def __init__(self, parent):
         self.parent = parent
-        self.graph = graph()
+        self.graph = graph_util()
         self.colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2']
      
     def plot_graph(self, query_num: str) -> str:

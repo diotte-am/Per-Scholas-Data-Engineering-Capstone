@@ -4,7 +4,7 @@ from schemas.transform_schema import transform_schema
 
 class transform():
 
-    def __init__(self, data):
+    def __init__(self, data: dict) -> None:
         self.data = data
         self.transform_data()
         

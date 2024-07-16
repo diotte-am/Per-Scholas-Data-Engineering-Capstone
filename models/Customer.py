@@ -1,6 +1,6 @@
 from datetime import date
 
-customer_dict = {
+customer_dict : dict = {
     "SSN": (0, "Social Security Number"), 
     "FIRST_NAME": (1, "First Name"), 
     "MIDDLE_NAME": (2, "Middle Name"), 
@@ -18,7 +18,7 @@ customer_dict = {
     }
 
 class Customer():
-    def __init__(self, customer):
+    def __init__(self, customer : list[str]):
         self.dict = {}
         self.dict["SSN"] = customer[0]
         self.dict["FIRST_NAME"] = customer[1]
@@ -35,7 +35,7 @@ class Customer():
         self.dict["LAST_UPDATED"] = customer[12]
         self.dict["CUST_ID"] = customer[13]
 
-    def customer_summary(self):
+    def customer_summary(self) -> str :
         message = "Is this the correct customer?\n"
         message += self.dict["FIRST_NAME"] + " " + self.dict["MIDDLE_NAME"] + " " + self.dict["LAST_NAME"] + "\n"
         message += self.dict["FULL_STREET_ADDRESS"] + "\n" + self.dict["CUST_CITY"] + ", " + self.dict["CUST_STATE"] + ", " + self.dict["CUST_COUNTRY"] + ", " + self.dict["CUST_ZIP"] + "\n"
@@ -43,14 +43,14 @@ class Customer():
         message += "Email: " + self.dict["CUST_EMAIL"] + "\n"
         return message
     
-    def first_name(self): return self.dict["FIRST_NAME"]
-    def get_id(self): return self.dict["CUST_ID"]
+    def first_name(self) -> str : return self.dict["FIRST_NAME"]
+    def get_id(self) -> int : return self.dict["CUST_ID"]
     
-    def full_name(self):
+    def full_name(self) -> str :
         name = self.dict["FIRST_NAME"] + " " + self.dict["MIDDLE_NAME"] + " " + self.dict["LAST_NAME"]
         return name
     
-    def get_edit_query(self):
+    def get_edit_query(self) -> str :
         string = ""
         for item in customer_dict.keys():
             if item not in ("CREDIT_CARD_NO", "CUST_ID", "SSN"):
@@ -60,6 +60,6 @@ class Customer():
                     string += str(item) + " = '" + str(self.dict[item]) + "', "
         return string
     
-    def print_fields(self):
+    def print_fields(self) -> None :
         for item in dict.keys():
             print(item)

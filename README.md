@@ -11,6 +11,10 @@
 
 - Load Data into MySQL with SQLAlchemy
 
+### Architecture
+![architecture of the program](images/data_lake.png)
+I could see how this was going to be a complicated program, I was communicating with a database, an api, and opening external documents. My program also had two distinct functions - ETL and displaying results - so I wanted to make sure I used separation of concerns when designing my program. I used the model view controller pattern to accomplish this. Only the model interacts with the data source and only the view interacts with the output. 
+
 ![Schema for creditcard_capstone db](images/data_lake.png)
 
 ### Cleaning and transforming data
