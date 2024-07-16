@@ -47,7 +47,64 @@ Hitting the edit customer button will bring up a new window where fields can be 
 ![Customers Tab, Req 2.2.3](images/gui_customer_tab_bill.png)
 Under the Get Bill tab, you can select the year and month and get an itemized bill for the customer's transactions during that period.
 
-![Customers Tab, Req 2.2.4](images/gui_customer_tab_timespan.png.png)
+![Customers Tab, Req 2.2.4](images/gui_customer_tab_timespan.png)
 Under the view transactions tab, you can use the two calendar widgets to select your date range. Hitting the button will query the db for any transactions this customer made during that period of time.
 
 ### Visualizations Tab, Req 3
+#### Calculate and plot which transaction type has the highest transaction count.
+![Customers Tab, Req 3.1](images/Req_3_1.png)
+Bills are the transaction type that has the highest transaction count. 
+
+#### Calculate and plot top 10 states with the highest number of customers.
+![Customers Tab, Req 3.2](images/Req_3_2.png)
+The states with the highest number of customers are:
+1. New York
+2. Georgia
+3. Pennsylvania
+4. Florida
+5. Illinois
+6. New Jersey
+7. Maryland
+8. California
+9. Ohio
+10. Michigan
+
+#### Calculate the total transaction sum for each customer based on their individual transactions. Identify the top 10 customers with the highest transaction amounts (in dollar value). Create a plot to showcase these top customers and their transaction sums.
+![Customers Tab, Req 3.3](images/Req_3_3.png)
+Most Valuable Customers:
+1. Ty Daly
+2. Jessie Boucher
+3. Phoebe Martin
+4. Thurman Vera
+5. Bret Perkins
+6. Joseph Mcclain
+7. Aurelia Haas
+8. Marcelo Emerson
+9. Alexis Villarreal
+10. Christina Snow
+
+### Loan Application Data API, Req 4
+![Customers Tab, Req 3.3](images/API_view.png)
+Loading the API data was much easier as it was contained in a single table and I didn't need to deal with any joins or foreign keys. There's no sensitive data that I need to hide in this table either.
+
+### Visualizations Part 2, Req 5
+#### Calculate and plot the percentage of applications approved for self-employed applicants. Use the appropriate chart or graph to represent this data.
+![Customers Tab, Req 5.1](images/Req_5_1.png)
+Significantly more self-employed people are approved for a loan than denied.
+
+#### Calculate the percentage of rejection for married male applicants. Use the ideal chart or graph to represent this data.
+![Customers Tab, Req 5.2](images/Req_5_2.png)
+The majority of married male applicants were approved for the loan.
+
+#### Calculate and plot the top three months with the largest volume of transaction data. Use the ideal chart or graph to represent this data.
+![Customers Tab, Req 5.3](images/Req_5_3.png)
+The months with the largest volume of tranactions are October, May, and February
+
+#### Calculate and plot which branch processed the highest total dollar value of healthcare transactions. Use the ideal chart or graph to represent this data.
+![Customers Tab, Req 5.4](images/Req_5_4.png)
+The branches with the highest total dollar value of healthcare transactions are:
+1. New Baltimore
+2. Richmond
+3. Brookfield
+4. El Dorado
+5. Kernersville
